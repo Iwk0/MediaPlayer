@@ -80,4 +80,10 @@ public class MusicPlayerActivity extends Activity {
             }
         });
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        musicPlayer.release();
+    }
 }
