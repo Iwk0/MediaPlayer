@@ -74,18 +74,4 @@ public class MusicPlayerActivity extends Activity {
             }
         });
     }
-
-/*    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (extras != null) {
-            musicPlayer = new MusicPlayer(this, extras.getString("SONG_PATH"), R.id.seekBar, R.id.image, R.id.progressBar);
-        }
-    }*/
-
-    /*@Override
-    protected void onStop() {
-        super.onStop();
-        musicPlayer.release();
-    }*/
 }
