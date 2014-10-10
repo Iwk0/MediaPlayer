@@ -2,9 +2,10 @@ package com.mediaplayer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,12 +16,13 @@ import android.widget.TextView;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class TrackListActivity extends Activity {
 
-    private static final String SONG_PATH = "SONG_PATH";
+    private static final String TRACK_PATH = "TRACK_PATH";
+    private static final String TRACK_NAME = "TRACK_NAME";
+
     private ArrayList<Track> tracks;
     private ProgressBar progressBar;
 
@@ -53,7 +55,8 @@ public class TrackListActivity extends Activity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         TextView textViewItem = (TextView) view.findViewById(R.id.songName);
                         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                        intent.putExtra(SONG_PATH, (String) textViewItem.getTag());
+                        intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
+                        intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         startActivity(intent);
                     }
                 });
@@ -63,27 +66,20 @@ public class TrackListActivity extends Activity {
 
             @Override
             protected Void doInBackground(Void... voids) {
-                getAbsolutePathOfAllSongs(Environment.getExternalStorageDirectory());
+                String[] type = {
+                        MediaStore.Audio.Media._ID,
+                        MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Media.DISPLAY_NAME };
+
+                Cursor files = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, type, null, null, null);
+
+                while(files.moveToNext()) {
+                    String trackName = files.getString(2);
+                    tracks.add(new Track(trackName.substring(0, trackName.length() - 4), files.getString(1)));
+                }
+
                 return null;
             }
         }.execute();
-    }
-
-    private void getAbsolutePathOfAllSongs(File dir) {
-        String extension = ".mp3";
-
-        File[] listFile = dir.listFiles();
-
-        if (listFile != null) {
-            for (File file : listFile) {
-                if (file.isDirectory()) {
-                    getAbsolutePathOfAllSongs(file);
-                } else {
-                    if (file.getName().endsWith(extension)) {
-                        tracks.add(new Track(file.getName(), file.getAbsolutePath()));
-                    }
-                }
-            }
-        }
     }
 }

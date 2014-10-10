@@ -17,8 +17,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MusicPlayerActivity"
-            android:label="@string/activity_music_player" >
+            android:name=".MusicPlayerActivity">
         </activity>
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

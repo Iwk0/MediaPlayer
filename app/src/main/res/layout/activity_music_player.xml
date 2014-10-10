@@ -5,10 +5,19 @@
     android:layout_height="match_parent"
     tools:context="com.mediaplayer.MusicPlayerActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/trackName" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/seekBar">
+        android:layout_above="@+id/seekBar"
+        android:layout_below="@+id/trackName">
 
         <ProgressBar
             android:id="@+id/progressBar"
