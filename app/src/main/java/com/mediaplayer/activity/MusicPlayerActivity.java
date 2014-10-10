@@ -1,4 +1,4 @@
-package com.mediaplayer;
+package com.mediaplayer.activity;
 
 import android.app.Activity;
 import android.media.AudioManager;
@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.mediaplayer.R;
 import com.mediaplayer.utils.MusicPlayer;
 
 public class MusicPlayerActivity extends Activity {

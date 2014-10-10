@@ -1,4 +1,4 @@
-package com.mediaplayer;
+package com.mediaplayer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
 
@@ -23,7 +24,6 @@ public class TrackListActivity extends Activity {
     private static final String TRACK_PATH = "TRACK_PATH";
     private static final String TRACK_NAME = "TRACK_NAME";
 
-    private ArrayList<Track> tracks;
     private ProgressBar progressBar;
 
     @Override
@@ -33,18 +33,17 @@ public class TrackListActivity extends Activity {
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, ArrayList<Track>>() {
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 progressBar.setVisibility(View.VISIBLE);
-                tracks = new ArrayList<Track>();
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
+            protected void onPostExecute(ArrayList<Track> tracks) {
+                super.onPostExecute(tracks);
 
                 ArrayAdapter loadSongAdapter = new LoadTrackAdapter(TrackListActivity.this, R.layout.song_list, tracks);
                 ListView listView = (ListView) findViewById(R.id.songListView);
@@ -65,7 +64,9 @@ public class TrackListActivity extends Activity {
             }
 
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected ArrayList<Track> doInBackground(Void... voids) {
+                ArrayList<Track> tracks = new ArrayList<Track>();
+
                 String[] type = {
                         MediaStore.Audio.Media._ID,
                         MediaStore.Audio.Media.DATA,
@@ -78,7 +79,7 @@ public class TrackListActivity extends Activity {
                     tracks.add(new Track(trackName.substring(0, trackName.length() - 4), files.getString(1)));
                 }
 
-                return null;
+                return tracks;
             }
         }.execute();
     }
