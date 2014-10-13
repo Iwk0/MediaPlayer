@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
+import com.mediaplayer.R;
 import com.mediaplayer.model.Image;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -22,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by imishev on 25.9.2014 г..
@@ -36,17 +39,20 @@ public class MusicPlayer {
     private MediaPlayer mp;
     private Handler handler;
     private Runnable runnable;
-    private SeekBar seekBar;
-    private ProgressBar progressBar;
     private Image image;
-    private ImageView imageView;
     private String trackPathLocal;
 
-    private int currentPosition, oldIndex = -1, newIndex, imageSize;
+    //Views
+    private SeekBar seekBar;
+    private ProgressBar progressBar;
+    private ImageView imageView;
+    private TextView currentTime;
+
+    private int oldIndex = -1, imageSize;
     private boolean isStopped;
     private double interval;
 
-    public MusicPlayer(Activity activity, String trackPath, int seekBarId, int imageViewId, int progressBarId) {
+    public MusicPlayer(Activity activity, String trackPath) {
         this.mp = new MediaPlayer();
         this.isStopped = true;
         this.trackPathLocal = trackPath;
@@ -76,18 +82,27 @@ public class MusicPlayer {
             Log.e("XmlPullParserException", e.getMessage());
         }
 
-        progressBar = (ProgressBar) activity.findViewById(progressBarId);
-        seekBar = (SeekBar) activity.findViewById(seekBarId);
-        imageView = (ImageView) activity.findViewById(imageViewId);
+        seekBar = (SeekBar) activity.findViewById(R.id.seekBar);
+        progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
+        imageView = (ImageView) activity.findViewById(R.id.image);
+        currentTime = (TextView) activity.findViewById(R.id.currentTime);
 
         handler = new Handler();
         runnable = new Runnable() {
+
+            private int currentPosition;
+            private int newIndex;
 
             @Override
             public void run() {
                 currentPosition = mp.getCurrentPosition();
                 seekBar.setProgress(currentPosition);
                 newIndex = (int) (currentPosition / interval);
+                currentTime.setText(String.format("%02d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes(currentPosition),
+                        TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))
+                ));
 
                 if (newIndex != oldIndex && newIndex < imageSize) {
                     new AsyncTask<Void, Void, Bitmap>() {
@@ -148,14 +163,20 @@ public class MusicPlayer {
         interval = mp.getDuration() * 1.0 / imageSize;
         isStopped = true;
         oldIndex = - 1;
-        currentPosition = 0;
         seekBar.setProgress(0);
+        currentTime.setText("00:00");
         trackPathLocal = trackPath;
     }
 
     public void seekTo(int i) {
         if (!isStopped) {
             mp.seekTo(i);
+        } else {
+            currentTime.setText(String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(i),
+                    TimeUnit.MILLISECONDS.toSeconds(i) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
+            ));
         }
     }
 

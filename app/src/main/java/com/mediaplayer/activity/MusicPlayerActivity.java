@@ -1,9 +1,9 @@
 package com.mediaplayer.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -25,7 +25,7 @@ public class MusicPlayerActivity extends Activity {
     private ArrayList<Track> tracks;
     private MusicPlayer musicPlayer;
     private ImageButton playButton;
-    private TextView trackName, currentTime;
+    private TextView trackName, songDuration;
     private SeekBar seekBar;
     private Bundle extras;
 
@@ -43,11 +43,20 @@ public class MusicPlayerActivity extends Activity {
             tracks = extras.getParcelableArrayList(TRACKS_PATH);
             String path = extras.getString(TRACK_PATH);
 
-            musicPlayer = new MusicPlayer(this, path, R.id.seekBar, R.id.image, R.id.progressBar);
+            musicPlayer = new MusicPlayer(this, path);
             musicPlayer.start();
 
             trackName = (TextView) findViewById(R.id.trackName);
             trackName.setText(extras.getString(TRACK_NAME));
+            trackName.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Intent trackInfoActivity = new Intent(MusicPlayerActivity.this, TrackInfoActivity.class);
+                    trackInfoActivity.putExtra("track name", trackName.getText());
+                    startActivity(trackInfoActivity);
+                }
+            });
 
             final int TRACK_SIZE = tracks.size();
             for (int index = 0; index < TRACK_SIZE; index++) {
@@ -59,8 +68,8 @@ public class MusicPlayerActivity extends Activity {
         }
 
         int duration = musicPlayer.getDuration();
-        currentTime = (TextView) findViewById(R.id.songDuration);
-        currentTime.setText(String.format("%02d:%02d",
+        songDuration = (TextView) findViewById(R.id.songDuration);
+        songDuration.setText(String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(duration),
                 TimeUnit.MILLISECONDS.toSeconds(duration) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
@@ -120,11 +129,13 @@ public class MusicPlayerActivity extends Activity {
                     songIndex--;
                     trackName.setText(tracks.get(songIndex).getName());
                     musicPlayer.stop(tracks.get(songIndex).getPath());
-                    seekBar.setMax(musicPlayer.getDuration());
-                    musicPlayer.start();
 
                     int duration = musicPlayer.getDuration();
-                    currentTime.setText(String.format("%02d:%02d",
+
+                    seekBar.setMax(duration);
+                    musicPlayer.start();
+
+                    songDuration.setText(String.format("%02d:%02d",
                             TimeUnit.MILLISECONDS.toMinutes(duration),
                             TimeUnit.MILLISECONDS.toSeconds(duration) -
                                     TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
@@ -141,11 +152,13 @@ public class MusicPlayerActivity extends Activity {
                     songIndex++;
                     trackName.setText(tracks.get(songIndex).getName());
                     musicPlayer.stop(tracks.get(songIndex).getPath());
-                    seekBar.setMax(musicPlayer.getDuration());
-                    musicPlayer.start();
 
                     int duration = musicPlayer.getDuration();
-                    currentTime.setText(String.format("%02d:%02d",
+
+                    seekBar.setMax(duration);
+                    musicPlayer.start();
+
+                    songDuration.setText(String.format("%02d:%02d",
                             TimeUnit.MILLISECONDS.toMinutes(duration),
                             TimeUnit.MILLISECONDS.toSeconds(duration) -
                                     TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
@@ -156,8 +169,8 @@ public class MusicPlayerActivity extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onBackPressed() {
+        super.onBackPressed();
         musicPlayer.release();
     }
 }
