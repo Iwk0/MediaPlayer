@@ -16,7 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/seekBar"
+        android:layout_above="@+id/timeLine"
         android:layout_below="@+id/trackName">
 
         <ProgressBar
@@ -37,22 +37,26 @@
 
     </RelativeLayout>
 
-<!--    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="1:25"
-        android:layout_above="@id/seekBar"
-        android:id="@+id/currentPosition" />
+        android:id="@+id/timeLine"
+        android:layout_above="@+id/seekBar">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="4:54"
-        android:layout_above="@id/seekBar"
-        android:layout_alignParentRight="true"
-        android:id="@+id/songDuration" />-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/currentTime" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_alignParentRight="true"
+            android:id="@+id/songDuration" />
+
+    </RelativeLayout >
 
     <SeekBar
         android:layout_width="match_parent"
@@ -73,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:id="@+id/back"
+            android:id="@+id/preview"
             android:src="@drawable/back" />
 
         <ImageButton
@@ -94,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:id="@+id/forward"
+            android:id="@+id/next"
             android:src="@drawable/forward" />
 
     </LinearLayout>

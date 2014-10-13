@@ -63,9 +63,8 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
             songViewHolder = (ViewHolder) view.getTag();
         }
 
-        Track song = new Track(trackNames.get(i).getName(), trackNames.get(i).getPath());
-        songViewHolder.trackName.setText(song.getName());
-        songViewHolder.trackName.setTag(song.getPath());
+        songViewHolder.trackName.setText(trackNames.get(i).getName());
+        songViewHolder.trackName.setTag(trackNames.get(i).getPath());
 
         return view;
     }

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by imishev on 25.9.2014 г..
  */
-public final class MusicPlayer {
+public class MusicPlayer {
 
     private final static String ID = "id";
     private final static String PATH = "path";
@@ -40,21 +40,22 @@ public final class MusicPlayer {
     private ProgressBar progressBar;
     private Image image;
     private ImageView imageView;
-    private String audioPath;
+    private String trackPathLocal;
 
-    private int currentPosition, oldIndex = -1, newIndex;
+    private int currentPosition, oldIndex = -1, newIndex, imageSize;
     private boolean isStopped;
+    private double interval;
 
     public MusicPlayer(Activity activity, String trackPath, int seekBarId, int imageViewId, int progressBarId) {
         this.mp = new MediaPlayer();
         this.isStopped = true;
-        this.audioPath = trackPath;
+        this.trackPathLocal = trackPath;
 
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                stop();
+                stop(trackPathLocal);
             }
         });
 
@@ -64,12 +65,15 @@ public final class MusicPlayer {
 
             image = xmlParserImage(parser, 1);
 
-            mp.setDataSource(trackPath);
+            mp.setDataSource(trackPathLocal);
             mp.prepare();
+
+            imageSize = image.getPaths().size();
+            interval = mp.getDuration() * 1.0 / imageSize;
         } catch (IOException e) {
             Log.e("IOException", e.getMessage());
         } catch (XmlPullParserException e) {
-            e.printStackTrace();
+            Log.e("XmlPullParserException", e.getMessage());
         }
 
         progressBar = (ProgressBar) activity.findViewById(progressBarId);
@@ -79,16 +83,13 @@ public final class MusicPlayer {
         handler = new Handler();
         runnable = new Runnable() {
 
-            private final int IMAGE_SIZE = image.getPaths().size();
-            private final double INTERVAL = mp.getDuration() * 1.0 / IMAGE_SIZE;
-
             @Override
             public void run() {
                 currentPosition = mp.getCurrentPosition();
                 seekBar.setProgress(currentPosition);
-                newIndex = (int) (currentPosition / INTERVAL);
+                newIndex = (int) (currentPosition / interval);
 
-                if (newIndex != oldIndex && newIndex < IMAGE_SIZE) {
+                if (newIndex != oldIndex && newIndex < imageSize) {
                     new AsyncTask<Void, Void, Bitmap>() {
 
                         @Override
@@ -115,8 +116,6 @@ public final class MusicPlayer {
                 handler.postDelayed(this, 1000);
             }
         };
-
-        this.start();
     }
 
     public void start() {
@@ -133,23 +132,25 @@ public final class MusicPlayer {
         mp.pause();
     }
 
-    public void stop() {
+    public void stop(String trackPath) {
         handler.removeCallbacks(runnable);
 
         mp.stop();
         mp.reset();
 
         try {
-            mp.setDataSource(audioPath);
+            mp.setDataSource(trackPath);
             mp.prepare();
         } catch (IOException e) {
             Log.e("IOException", e.getMessage());
         }
 
+        interval = mp.getDuration() * 1.0 / imageSize;
         isStopped = true;
         oldIndex = - 1;
         currentPosition = 0;
         seekBar.setProgress(0);
+        trackPathLocal = trackPath;
     }
 
     public void seekTo(int i) {

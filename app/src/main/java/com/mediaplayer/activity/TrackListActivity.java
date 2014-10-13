@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 public class TrackListActivity extends Activity {
 
+    private static final String TRACKS_PATH = "TRACKS_PATH";
     private static final String TRACK_PATH = "TRACK_PATH";
     private static final String TRACK_NAME = "TRACK_NAME";
 
@@ -42,7 +43,7 @@ public class TrackListActivity extends Activity {
             }
 
             @Override
-            protected void onPostExecute(ArrayList<Track> tracks) {
+            protected void onPostExecute(final ArrayList<Track> tracks) {
                 super.onPostExecute(tracks);
 
                 ArrayAdapter loadSongAdapter = new LoadTrackAdapter(TrackListActivity.this, R.layout.song_list, tracks);
@@ -53,9 +54,11 @@ public class TrackListActivity extends Activity {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         TextView textViewItem = (TextView) view.findViewById(R.id.songName);
+
                         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                        intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
+                        intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
+                        intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
                         startActivity(intent);
                     }
                 });
