@@ -166,6 +166,18 @@ public class MusicPlayerActivity extends Activity {
                 }
             }
         });
+
+        findViewById(R.id.repeat).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (musicPlayer.isLooping()) {
+                    musicPlayer.setLooping(false);
+                } else {
+                    musicPlayer.setLooping(true);
+                }
+            }
+        });
     }
 
     @Override

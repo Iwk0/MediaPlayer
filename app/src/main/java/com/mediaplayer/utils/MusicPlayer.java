@@ -186,12 +186,20 @@ public class MusicPlayer {
         mp = null;
     }
 
+    public void setLooping(boolean loop) {
+        mp.setLooping(loop);
+    }
+
     public int getDuration() {
         return mp.getDuration();
     }
 
     public boolean isPlaying() {
         return mp.isPlaying();
+    }
+
+    public boolean isLooping() {
+        return mp.isLooping();
     }
 
     private Image xmlParserImage(XmlPullParser parser, int imagesId) throws XmlPullParserException, IOException {

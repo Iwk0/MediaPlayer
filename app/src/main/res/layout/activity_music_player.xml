@@ -79,6 +79,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:id="@+id/repeat"
+            android:src="@drawable/repeat" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
             android:id="@+id/preview"
             android:src="@drawable/back" />
 
