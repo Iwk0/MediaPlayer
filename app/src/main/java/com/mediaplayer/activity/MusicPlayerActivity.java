@@ -27,6 +27,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,8 +54,9 @@ public class MusicPlayerActivity extends Activity {
     private TextView currentTime, trackDuration, trackName;
 
     private int songIndex, numberOfImages, oldIndex = -1;
+    private byte changeMode;
     private double interval;
-    private boolean isLooping, nextMode, randomMode;
+    private boolean isLooping;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,14 +89,14 @@ public class MusicPlayerActivity extends Activity {
                         ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
                         //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
                         //Линк за отваряне на галерия със снимки
-                        if (nextMode && songIndex + 1 < tracks.size()) {
-                            songIndex++;
-                        } else if (randomMode) {
-                            songIndex = new Random().nextInt(tracks.size()) + 0;
-                        } else {
-                            mediaPlayer.seekTo(0);
-                        }
+                        Random random = new Random();
 
+                        switch (changeMode) {
+                            case 0 : mediaPlayer.seekTo(0); break;
+                            case 1 : songIndex++; break;
+                            case 2 : songIndex = random.nextInt(tracks.size()); break;
+                        }
+                        //TODO да оправя мода
                         try {
                             songChanger();
                         } catch (IOException e) {
@@ -163,121 +165,121 @@ public class MusicPlayerActivity extends Activity {
                     handler.postDelayed(this, 1000);
                 }
             };
+
+            /*Events*/
+            trackName.setText(extras.getString(TRACK_NAME));
+            trackName.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
+                    trackInfoActivity.putExtra("track name", ((TextView) view).getText());
+                    startActivity(trackInfoActivity);
+                }
+            });
+
+            int duration = mediaPlayer.getDuration();
+            trackDuration.setText(String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(duration),
+                    TimeUnit.MILLISECONDS.toSeconds(duration) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+            ));
+
+            seekBar.setMax(duration);
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    if (b) {
+                        mediaPlayer.seekTo(i);
+                    } else {
+                        currentTime.setText(String.format("%02d:%02d",
+                                TimeUnit.MILLISECONDS.toMinutes(i),
+                                TimeUnit.MILLISECONDS.toSeconds(i) -
+                                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
+                        ));
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            findViewById(R.id.nextMode).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    changeMode = changeMode == 2 ? changeMode = 0 : ++changeMode;
+                }
+            });
+
+            findViewById(R.id.controlButton).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.pause();
+                        ((ImageButton) view).setImageResource(R.drawable.play);
+                    } else {
+                        mediaPlayer.start();
+                        ((ImageButton) view).setImageResource(R.drawable.pause);
+                    }
+                }
+            });
+
+            findViewById(R.id.preview).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (songIndex - 1 >= 0) {
+                        songIndex--;
+
+                        try {
+                            songChanger();
+                        } catch (IOException e) {
+                            Log.e("IOException", e.getMessage());
+                        }
+                    }
+                }
+            });
+
+            findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (songIndex + 1 < tracks.size()) {
+                        songIndex++;
+
+                        try {
+                            songChanger();
+                        } catch (IOException e) {
+                            Log.e("IOException", e.getMessage());
+                        }
+                    }
+                }
+            });
+
+            findViewById(R.id.repeat).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if (mediaPlayer.isLooping()) {
+                        mediaPlayer.setLooping(false);
+                    } else {
+                        mediaPlayer.setLooping(true);
+                    }
+
+                    isLooping = mediaPlayer.isLooping();
+                }
+            });
         }
-
-        /*Events*/
-        trackName.setText(extras.getString(TRACK_NAME));
-        trackName.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
-                trackInfoActivity.putExtra("track name", ((TextView) view).getText());
-                startActivity(trackInfoActivity);
-            }
-        });
-
-        int duration = mediaPlayer.getDuration();
-        trackDuration.setText(String.format("%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(duration),
-                TimeUnit.MILLISECONDS.toSeconds(duration) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-        ));
-
-        seekBar.setMax(duration);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (b) {
-                    mediaPlayer.seekTo(i);
-                } else {
-                    currentTime.setText(String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(i),
-                            TimeUnit.MILLISECONDS.toSeconds(i) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
-                    ));
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        findViewById(R.id.nextMode).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                nextMode = !nextMode;
-            }
-        });
-
-        findViewById(R.id.controlButton).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
-                    ((ImageButton) view).setImageResource(R.drawable.play);
-                } else {
-                    mediaPlayer.start();
-                    ((ImageButton) view).setImageResource(R.drawable.pause);
-                }
-            }
-        });
-
-        findViewById(R.id.preview).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (songIndex - 1 >= 0) {
-                    songIndex--;
-
-                    try {
-                        songChanger();
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            }
-        });
-
-        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (songIndex + 1 < tracks.size()) {
-                    songIndex++;
-
-                    try {
-                        songChanger();
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            }
-        });
-
-        findViewById(R.id.repeat).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer.isLooping()) {
-                    mediaPlayer.setLooping(false);
-                } else {
-                    mediaPlayer.setLooping(true);
-                }
-
-                isLooping = mediaPlayer.isLooping();
-            }
-        });
     }
 
     @Override

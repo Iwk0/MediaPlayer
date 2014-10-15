@@ -53,7 +53,7 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
         ViewHolder songViewHolder;
 
         if (view == null) {
-            view = inflater.inflate(R.layout.song_list, viewGroup, false);
+            view = inflater.inflate(R.layout.track_list, viewGroup, false);
 
             songViewHolder = new ViewHolder();
             songViewHolder.trackName = (TextView) view.findViewById(R.id.songName);

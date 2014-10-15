@@ -46,7 +46,7 @@ public class TrackListActivity extends Activity {
             protected void onPostExecute(final ArrayList<Track> tracks) {
                 super.onPostExecute(tracks);
 
-                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(TrackListActivity.this, R.layout.song_list, tracks);
+                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(TrackListActivity.this, R.layout.track_list, tracks);
                 ListView listView = (ListView) findViewById(R.id.songListView);
                 listView.setAdapter(loadSongAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
