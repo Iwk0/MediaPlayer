@@ -2,40 +2,72 @@ package com.mediaplayer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.mediaplayer.R;
+import com.mediaplayer.model.Image;
 import com.mediaplayer.model.Track;
-import com.mediaplayer.utils.MusicPlayer;
+import com.mediaplayer.utils.ImageResize;
+import com.mediaplayer.utils.XmlParser;
 
-import java.util.ArrayList;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Created by imishev on 15.10.2014 г..
+ */
 public class MusicPlayerActivity extends Activity {
 
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";
     private static final String TRACK_NAME = "track name";
+    private static final String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 
-    private ArrayList<Track> tracks;
-    private MusicPlayer musicPlayer;
-    private ImageButton playButton;
-    private TextView trackName, songDuration;
-    private SeekBar seekBar;
+    private MediaPlayer mediaPlayer;
+    private List<Track> tracks;
     private Bundle extras;
+    private Image image;
+    private Runnable runnable;
+    private Handler handler;
 
-    private int songIndex;
+    //Views
+    private SeekBar seekBar;
+    private ProgressBar progressBar;
+    private ImageView imageView;
+    private TextView currentTime, songDuration, trackName;
+
+    private int songIndex, numberOfImages, oldIndex = -1;
+    private double interval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
 
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        imageView = (ImageView) findViewById(R.id.image);
+        currentTime = (TextView) findViewById(R.id.currentTime);
+        songDuration = (TextView) findViewById(R.id.songDuration);
+        trackName = (TextView) findViewById(R.id.trackName);
+
+        //Allow music volume control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         extras = getIntent().getExtras();
@@ -43,20 +75,29 @@ public class MusicPlayerActivity extends Activity {
             tracks = extras.getParcelableArrayList(TRACKS_PATH);
             String path = extras.getString(TRACK_PATH);
 
-            musicPlayer = new MusicPlayer(this, path);
-            musicPlayer.start();
-
-            trackName = (TextView) findViewById(R.id.trackName);
-            trackName.setText(extras.getString(TRACK_NAME));
-            trackName.setOnClickListener(new View.OnClickListener() {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                 @Override
-                public void onClick(View view) {
-                    Intent trackInfoActivity = new Intent(MusicPlayerActivity.this, TrackInfoActivity.class);
-                    trackInfoActivity.putExtra("track name", trackName.getText());
-                    startActivity(trackInfoActivity);
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    seekBar.setProgress(0);
+                    ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
                 }
             });
+
+            try {
+                image = XmlParser.xmlParserImage(1);
+
+                mediaPlayer.setDataSource(path);
+                mediaPlayer.prepare();
+
+                numberOfImages = image.getPaths().size();
+                interval = mediaPlayer.getDuration() * 1.0 / numberOfImages;
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            } catch (XmlPullParserException e) {
+                Log.e("XmlPullParserException", e.getMessage());
+            }
 
             final int TRACK_SIZE = tracks.size();
             for (int index = 0; index < TRACK_SIZE; index++) {
@@ -65,24 +106,84 @@ public class MusicPlayerActivity extends Activity {
                     break;
                 }
             }
+
+            handler = new Handler();
+            runnable = new Runnable() {
+
+                private int currentPosition;
+                private int newIndex;
+
+                @Override
+                public void run() {
+                    currentPosition = mediaPlayer.getCurrentPosition();
+                    seekBar.setProgress(currentPosition);
+                    newIndex = (int) (currentPosition / interval);
+                    currentTime.setText(String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(currentPosition),
+                            TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))));
+
+                    if (newIndex != oldIndex && newIndex < numberOfImages) {
+                        new AsyncTask<Void, Void, Bitmap>() {
+
+                            @Override
+                            protected void onPreExecute() {
+                                imageView.setImageBitmap(null);
+                                progressBar.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            protected void onPostExecute(Bitmap bitmap) {
+                                super.onPostExecute(bitmap);
+                                progressBar.setVisibility(View.GONE);
+                                imageView.setImageBitmap(bitmap);
+                                oldIndex = newIndex;
+                            }
+
+                            @Override
+                            protected Bitmap doInBackground(Void... voids) {
+                                return ImageResize.decodeSampledBitmapFromUri(STORAGE_PATH + image.getPaths().get(newIndex), 250, 250);
+                            }
+                        }.execute();
+                    }
+
+                    handler.postDelayed(this, 1000);
+                }
+            };
         }
 
-        int duration = musicPlayer.getDuration();
-        songDuration = (TextView) findViewById(R.id.songDuration);
+        /*Events*/
+        int duration = mediaPlayer.getDuration();
         songDuration.setText(String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(duration),
                 TimeUnit.MILLISECONDS.toSeconds(duration) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
         ));
 
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        trackName.setText(extras.getString(TRACK_NAME));
+        trackName.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
+                trackInfoActivity.putExtra("track name", trackName.getText());
+                startActivity(trackInfoActivity);
+            }
+        });
+
         seekBar.setMax(duration);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (b) {
-                    musicPlayer.seekTo(i);
+                    mediaPlayer.seekTo(i);
+                } else {
+                    currentTime.setText(String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(i),
+                            TimeUnit.MILLISECONDS.toSeconds(i) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
+                    ));
                 }
             }
 
@@ -97,27 +198,17 @@ public class MusicPlayerActivity extends Activity {
             }
         });
 
-        playButton = (ImageButton) findViewById(R.id.controlButton);
-        playButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.controlButton).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                if (musicPlayer.isPlaying()) {
-                    musicPlayer.pause();
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
                     ((ImageButton) view).setImageResource(R.drawable.play);
                 } else {
-                    musicPlayer.start();
+                    mediaPlayer.start();
                     ((ImageButton) view).setImageResource(R.drawable.pause);
                 }
-            }
-        });
-
-        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                musicPlayer.stop(tracks.get(songIndex).getPath());
-                playButton.setImageResource(R.drawable.play);
             }
         });
 
@@ -127,19 +218,12 @@ public class MusicPlayerActivity extends Activity {
             public void onClick(View view) {
                 if (songIndex - 1 >= 0) {
                     songIndex--;
-                    trackName.setText(tracks.get(songIndex).getName());
-                    musicPlayer.stop(tracks.get(songIndex).getPath());
 
-                    int duration = musicPlayer.getDuration();
-
-                    seekBar.setMax(duration);
-                    musicPlayer.start();
-
-                    songDuration.setText(String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(duration),
-                            TimeUnit.MILLISECONDS.toSeconds(duration) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-                    ));
+                    try {
+                        songChanger();
+                    } catch (IOException e) {
+                        Log.e("IOException", e.getMessage());
+                    }
                 }
             }
         });
@@ -150,19 +234,12 @@ public class MusicPlayerActivity extends Activity {
             public void onClick(View view) {
                 if (songIndex + 1 < tracks.size()) {
                     songIndex++;
-                    trackName.setText(tracks.get(songIndex).getName());
-                    musicPlayer.stop(tracks.get(songIndex).getPath());
 
-                    int duration = musicPlayer.getDuration();
-
-                    seekBar.setMax(duration);
-                    musicPlayer.start();
-
-                    songDuration.setText(String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(duration),
-                            TimeUnit.MILLISECONDS.toSeconds(duration) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-                    ));
+                    try {
+                        songChanger();
+                    } catch (IOException e) {
+                        Log.e("IOException", e.getMessage());
+                    }
                 }
             }
         });
@@ -171,18 +248,51 @@ public class MusicPlayerActivity extends Activity {
 
             @Override
             public void onClick(View view) {
-                if (musicPlayer.isLooping()) {
-                    musicPlayer.setLooping(false);
+                if (mediaPlayer.isLooping()) {
+                    mediaPlayer.setLooping(false);
                 } else {
-                    musicPlayer.setLooping(true);
+                    mediaPlayer.setLooping(true);
                 }
             }
         });
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mediaPlayer.start();
+        handler.post(runnable);
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        musicPlayer.release();
+
+        handler.removeCallbacks(runnable);
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
+    private void songChanger() throws IOException {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaPlayer.setDataSource(tracks.get(songIndex).getPath());
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+
+        trackName.setText(tracks.get(songIndex).getName());
+
+        int duration = mediaPlayer.getDuration();
+
+        seekBar.setProgress(0);
+        seekBar.setMax(duration);
+
+        songDuration.setText(String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(duration),
+                TimeUnit.MILLISECONDS.toSeconds(duration) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+        ));
     }
 }
