@@ -50,10 +50,11 @@ public class MusicPlayerActivity extends Activity {
     private SeekBar seekBar;
     private ProgressBar progressBar;
     private ImageView imageView;
-    private TextView currentTime, songDuration, trackName;
+    private TextView currentTime, trackDuration, trackName;
 
     private int songIndex, numberOfImages, oldIndex = -1;
     private double interval;
+    private boolean isLooping, nextMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +65,7 @@ public class MusicPlayerActivity extends Activity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.image);
         currentTime = (TextView) findViewById(R.id.currentTime);
-        songDuration = (TextView) findViewById(R.id.songDuration);
+        trackDuration = (TextView) findViewById(R.id.songDuration);
         trackName = (TextView) findViewById(R.id.trackName);
 
         //Allow music volume control
@@ -75,22 +76,31 @@ public class MusicPlayerActivity extends Activity {
             tracks = extras.getParcelableArrayList(TRACKS_PATH);
             String path = extras.getString(TRACK_PATH);
 
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    seekBar.setProgress(0);
-                    ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
-                }
-            });
-
             try {
-                image = XmlParser.xmlParserImage(1);
-
+                mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
+                        //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
+                        //Линк за отваряне на галерия със снимки
+                        if (nextMode && songIndex + 1 < tracks.size()) {
+                            try {
+                                songIndex++;
+                                songChanger();
+                            } catch (IOException e) {
+                                Log.e("IOException", e.getMessage());
+                            }
+                        } else {
+                            mediaPlayer.seekTo(0);
+                        }
+                    }
+                });
+
+                image = XmlParser.xmlParserImage(1);
                 numberOfImages = image.getPaths().size();
                 interval = mediaPlayer.getDuration() * 1.0 / numberOfImages;
             } catch (IOException e) {
@@ -99,8 +109,8 @@ public class MusicPlayerActivity extends Activity {
                 Log.e("XmlPullParserException", e.getMessage());
             }
 
-            final int TRACK_SIZE = tracks.size();
-            for (int index = 0; index < TRACK_SIZE; index++) {
+            final int TRACK_LIST_SIZE = tracks.size();
+            for (int index = 0; index < TRACK_LIST_SIZE; index++) {
                 if (tracks.get(index).getPath().equals(path)) {
                     songIndex = index;
                     break;
@@ -153,23 +163,23 @@ public class MusicPlayerActivity extends Activity {
         }
 
         /*Events*/
-        int duration = mediaPlayer.getDuration();
-        songDuration.setText(String.format("%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(duration),
-                TimeUnit.MILLISECONDS.toSeconds(duration) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-        ));
-
         trackName.setText(extras.getString(TRACK_NAME));
         trackName.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
-                trackInfoActivity.putExtra("track name", trackName.getText());
+                trackInfoActivity.putExtra("track name", ((TextView) view).getText());
                 startActivity(trackInfoActivity);
             }
         });
+
+        int duration = mediaPlayer.getDuration();
+        trackDuration.setText(String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(duration),
+                TimeUnit.MILLISECONDS.toSeconds(duration) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+        ));
 
         seekBar.setMax(duration);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -195,6 +205,14 @@ public class MusicPlayerActivity extends Activity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+
+        findViewById(R.id.nextMode).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                nextMode = !nextMode;
             }
         });
 
@@ -253,6 +271,8 @@ public class MusicPlayerActivity extends Activity {
                 } else {
                     mediaPlayer.setLooping(true);
                 }
+
+                isLooping = mediaPlayer.isLooping();
             }
         });
     }
@@ -276,11 +296,11 @@ public class MusicPlayerActivity extends Activity {
     }
 
     private void songChanger() throws IOException {
-        mediaPlayer.stop();
         mediaPlayer.reset();
         mediaPlayer.setDataSource(tracks.get(songIndex).getPath());
         mediaPlayer.prepare();
         mediaPlayer.start();
+        mediaPlayer.setLooping(isLooping);
 
         trackName.setText(tracks.get(songIndex).getName());
 
@@ -289,7 +309,7 @@ public class MusicPlayerActivity extends Activity {
         seekBar.setProgress(0);
         seekBar.setMax(duration);
 
-        songDuration.setText(String.format("%02d:%02d",
+        trackDuration.setText(String.format("%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(duration),
                 TimeUnit.MILLISECONDS.toSeconds(duration) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
