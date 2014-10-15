@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,9 +22,9 @@ import java.util.ArrayList;
 
 public class TrackListActivity extends Activity {
 
-    private static final String TRACKS_PATH = "TRACKS_PATH";
-    private static final String TRACK_PATH = "TRACK_PATH";
-    private static final String TRACK_NAME = "TRACK_NAME";
+    private static final String TRACKS_PATH = "tracks path";
+    private static final String TRACK_PATH = "track path";
+    private static final String TRACK_NAME = "track name";
 
     private ProgressBar progressBar;
 
@@ -59,6 +60,7 @@ public class TrackListActivity extends Activity {
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
                         intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
+
                         startActivity(intent);
                     }
                 });

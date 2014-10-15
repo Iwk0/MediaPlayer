@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -52,7 +53,7 @@ public class MusicPlayer {
     private boolean isStopped;
     private double interval;
 
-    public MusicPlayer(Activity activity, String trackPath) {
+    public MusicPlayer(final Activity activity, String trackPath) {
         this.mp = new MediaPlayer();
         this.isStopped = true;
         this.trackPathLocal = trackPath;
@@ -62,6 +63,7 @@ public class MusicPlayer {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 stop(trackPathLocal);
+                ((ImageButton) (activity.findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
             }
         });
 
@@ -101,8 +103,7 @@ public class MusicPlayer {
                 currentTime.setText(String.format("%02d:%02d",
                         TimeUnit.MILLISECONDS.toMinutes(currentPosition),
                         TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))
-                ));
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))));
 
                 if (newIndex != oldIndex && newIndex < imageSize) {
                     new AsyncTask<Void, Void, Bitmap>() {
@@ -182,8 +183,10 @@ public class MusicPlayer {
 
     public void release() {
         handler.removeCallbacks(runnable);
-        mp.release();
-        mp = null;
+        if (mp != null) {
+            mp.release();
+            mp = null;
+        }
     }
 
     public void setLooping(boolean loop) {

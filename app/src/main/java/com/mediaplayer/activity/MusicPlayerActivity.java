@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MusicPlayerActivity extends Activity {
 
-    private static final String TRACKS_PATH = "TRACKS_PATH";
-    private static final String TRACK_PATH = "TRACK_PATH";
-    private static final String TRACK_NAME = "TRACK_NAME";
+    private static final String TRACKS_PATH = "tracks path";
+    private static final String TRACK_PATH = "track path";
+    private static final String TRACK_NAME = "track name";
 
     private ArrayList<Track> tracks;
     private MusicPlayer musicPlayer;
