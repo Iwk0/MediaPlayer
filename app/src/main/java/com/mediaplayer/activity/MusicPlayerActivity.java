@@ -54,7 +54,7 @@ public class MusicPlayerActivity extends Activity {
 
     private int songIndex, numberOfImages, oldIndex = -1;
     private double interval;
-    private boolean isLooping, nextMode;
+    private boolean isLooping, nextMode, randomMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,14 +88,17 @@ public class MusicPlayerActivity extends Activity {
                         //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
                         //Линк за отваряне на галерия със снимки
                         if (nextMode && songIndex + 1 < tracks.size()) {
-                            try {
-                                songIndex++;
-                                songChanger();
-                            } catch (IOException e) {
-                                Log.e("IOException", e.getMessage());
-                            }
+                            songIndex++;
+                        } else if (randomMode) {
+                            songIndex = new Random().nextInt(tracks.size()) + 0;
                         } else {
                             mediaPlayer.seekTo(0);
+                        }
+
+                        try {
+                            songChanger();
+                        } catch (IOException e) {
+                            Log.e("IOException", e.getMessage());
                         }
                     }
                 });
