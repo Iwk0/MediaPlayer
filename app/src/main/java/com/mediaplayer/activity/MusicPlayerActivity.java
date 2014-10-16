@@ -64,6 +64,7 @@ public class MusicPlayerActivity extends Activity {
 
         saveSettings = new SaveSettings(this);
         isRandomChange = saveSettings.loadSettings(SAVE_RANDOM_MODE, false);
+        isLooping = saveSettings.loadSettings(SAVE_LOOPING, true);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -85,7 +86,7 @@ public class MusicPlayerActivity extends Activity {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
-                mediaPlayer.setLooping(saveSettings.loadSettings(SAVE_LOOPING, true));
+                mediaPlayer.setLooping(isLooping);
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                     @Override
@@ -242,6 +243,8 @@ public class MusicPlayerActivity extends Activity {
         trackName.setText(tracks.get(songIndex).getName());
 
         int duration = mediaPlayer.getDuration();
+
+        interval = duration * 1.0 / numberOfImages;
 
         seekBar.setProgress(0);
         seekBar.setMax(duration);

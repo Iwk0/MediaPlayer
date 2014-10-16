@@ -114,7 +114,7 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/nextMode"
-            android:src="@drawable/repeat"
+            android:src="@drawable/random"
             android:onClick="clickEvents" />
 
     </LinearLayout>
