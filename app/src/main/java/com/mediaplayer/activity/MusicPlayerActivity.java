@@ -92,7 +92,8 @@ public class MusicPlayerActivity extends Activity {
                             case 1 : songIndex++; break;
                             case 2 : songIndex = random.nextInt(tracks.size()); break;
                         }
-                        //TODO да оправя мода
+                        //TODO fix music mode
+                        //TODO hide all events in xml file
                         try {
                             songChanger();
                         } catch (IOException e) {
