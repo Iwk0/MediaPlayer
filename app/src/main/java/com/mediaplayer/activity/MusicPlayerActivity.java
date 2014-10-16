@@ -138,10 +138,6 @@ public class MusicPlayerActivity extends Activity {
                     currentPosition = mediaPlayer.getCurrentPosition();
                     seekBar.setProgress(currentPosition);
                     newIndex = (int) (currentPosition / interval);
-                    currentTime.setText(String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(currentPosition),
-                            TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))));
 
                     if (newIndex != oldIndex && newIndex < numberOfImages) {
                         new AsyncTask<Void, Void, Bitmap>() {
@@ -185,13 +181,13 @@ public class MusicPlayerActivity extends Activity {
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                     if (b) {
                         mediaPlayer.seekTo(i);
-                    } else {
-                        currentTime.setText(String.format("%02d:%02d",
-                                TimeUnit.MILLISECONDS.toMinutes(i),
-                                TimeUnit.MILLISECONDS.toSeconds(i) -
-                                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
-                        ));
                     }
+
+                    currentTime.setText(String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(i),
+                            TimeUnit.MILLISECONDS.toSeconds(i) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
+                    ));
                 }
 
                 @Override
