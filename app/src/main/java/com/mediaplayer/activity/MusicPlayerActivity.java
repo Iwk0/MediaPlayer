@@ -168,9 +168,6 @@ public class MusicPlayerActivity extends Activity {
                 }
             };
 
-            Animation hyperspaceJump = AnimationUtils.loadAnimation(this, R.anim.move);
-            trackName.startAnimation(hyperspaceJump);
-
             int duration = mediaPlayer.getDuration();
             trackDuration.setText(String.format("%02d:%02d",
                     TimeUnit.MILLISECONDS.toMinutes(duration),
@@ -212,6 +209,9 @@ public class MusicPlayerActivity extends Activity {
         super.onStart();
         mediaPlayer.start();
         handler.post(runnable);
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
+        trackName.startAnimation(animation);
     }
 
     @Override
