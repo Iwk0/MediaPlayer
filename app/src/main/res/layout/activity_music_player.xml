@@ -63,6 +63,8 @@
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:id="@+id/seekBar"
         android:layout_above="@+id/menu" />
 
@@ -80,35 +82,40 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/repeat"
-            android:src="@drawable/repeat" />
+            android:src="@drawable/repeat"
+            android:onClick="clickEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/preview"
-            android:src="@drawable/back" />
+            android:src="@drawable/back"
+            android:onClick="changeTrackEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/controlButton"
-            android:src="@drawable/pause" />
+            android:src="@drawable/pause"
+            android:onClick="clickEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/next"
-            android:src="@drawable/forward" />
+            android:src="@drawable/forward"
+            android:onClick="changeTrackEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/nextMode"
-            android:src="@drawable/repeat" />
+            android:src="@drawable/repeat"
+            android:onClick="clickEvents" />
 
     </LinearLayout>
 

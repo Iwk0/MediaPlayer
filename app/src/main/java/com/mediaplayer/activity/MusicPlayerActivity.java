@@ -21,6 +21,7 @@ import com.mediaplayer.R;
 import com.mediaplayer.model.Image;
 import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.ImageResize;
+import com.mediaplayer.utils.SaveSettings;
 import com.mediaplayer.utils.XmlParser;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,6 +36,8 @@ public class MusicPlayerActivity extends Activity {
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";
     private static final String TRACK_NAME = "track name";
+    private static final String SAVE_LOOPING = "looping";
+    private static final String SAVE_RANDOM_MODE = "random mode";
     private static final String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 
     private MediaPlayer mediaPlayer;
@@ -42,6 +45,7 @@ public class MusicPlayerActivity extends Activity {
     private Image image;
     private Runnable runnable;
     private Handler handler;
+    private SaveSettings saveSettings;
 
     //Views
     private SeekBar seekBar;
@@ -50,14 +54,16 @@ public class MusicPlayerActivity extends Activity {
     private TextView currentTime, trackDuration, trackName;
 
     private int songIndex, numberOfImages, oldIndex = -1;
-    private byte changeMode;
     private double interval;
-    private boolean isLooping;
+    private boolean isLooping, isRandomChange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
+
+        saveSettings = new SaveSettings(this);
+        isRandomChange = saveSettings.loadSettings(SAVE_RANDOM_MODE, false);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -72,28 +78,29 @@ public class MusicPlayerActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             tracks = extras.getParcelableArrayList(TRACKS_PATH);
+            trackName.setText(extras.getString(TRACK_NAME));
             String path = extras.getString(TRACK_PATH);
 
             try {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
+                mediaPlayer.setLooping(saveSettings.loadSettings(SAVE_LOOPING, true));
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
                         //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
-                        //Линк за отваряне на галерия със снимки
-                        Random random = new Random();
+                        //TODO Линк за отваряне на галерия със снимки
 
-                        switch (changeMode) {
-                            case 0 : mediaPlayer.seekTo(0); break;
-                            case 1 : songIndex++; break;
-                            case 2 : songIndex = random.nextInt(tracks.size()); break;
+                        if (isRandomChange) {
+                            Random random = new Random();
+                            songIndex = random.nextInt(tracks.size());
+                        } else {
+                            songIndex++;
                         }
-                        //TODO fix music mode
-                        //TODO hide all events in xml file
+
                         try {
                             songChanger();
                         } catch (IOException e) {
@@ -163,18 +170,6 @@ public class MusicPlayerActivity extends Activity {
                 }
             };
 
-            /*Events*/
-            trackName.setText(extras.getString(TRACK_NAME));
-            trackName.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
-                    trackInfoActivity.putExtra("track name", ((TextView) view).getText());
-                    startActivity(trackInfoActivity);
-                }
-            });
-
             int duration = mediaPlayer.getDuration();
             trackDuration.setText(String.format("%02d:%02d",
                     TimeUnit.MILLISECONDS.toMinutes(duration),
@@ -208,74 +203,6 @@ public class MusicPlayerActivity extends Activity {
 
                 }
             });
-
-            findViewById(R.id.nextMode).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    changeMode = changeMode == 2 ? changeMode = 0 : ++changeMode;
-                }
-            });
-
-            findViewById(R.id.controlButton).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.pause();
-                        ((ImageButton) view).setImageResource(R.drawable.play);
-                    } else {
-                        mediaPlayer.start();
-                        ((ImageButton) view).setImageResource(R.drawable.pause);
-                    }
-                }
-            });
-
-            findViewById(R.id.preview).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (songIndex - 1 >= 0) {
-                        songIndex--;
-
-                        try {
-                            songChanger();
-                        } catch (IOException e) {
-                            Log.e("IOException", e.getMessage());
-                        }
-                    }
-                }
-            });
-
-            findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (songIndex + 1 < tracks.size()) {
-                        songIndex++;
-
-                        try {
-                            songChanger();
-                        } catch (IOException e) {
-                            Log.e("IOException", e.getMessage());
-                        }
-                    }
-                }
-            });
-
-            findViewById(R.id.repeat).setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (mediaPlayer.isLooping()) {
-                        mediaPlayer.setLooping(false);
-                    } else {
-                        mediaPlayer.setLooping(true);
-                    }
-
-                    isLooping = mediaPlayer.isLooping();
-                }
-            });
         }
     }
 
@@ -297,6 +224,14 @@ public class MusicPlayerActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        saveSettings.saveSettings(SAVE_LOOPING, isLooping);
+        saveSettings.saveSettings(SAVE_RANDOM_MODE, isRandomChange);
+    }
+
     private void songChanger() throws IOException {
         mediaPlayer.reset();
         mediaPlayer.setDataSource(tracks.get(songIndex).getPath());
@@ -316,5 +251,61 @@ public class MusicPlayerActivity extends Activity {
                 TimeUnit.MILLISECONDS.toSeconds(duration) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
         ));
+    }
+
+    public void changeTrackEvents(View view) {
+        int viewId = view.getId();
+        Random random = new Random();
+
+        if (viewId == R.id.next) {
+            if (isRandomChange) {
+                songIndex = random.nextInt(tracks.size());
+            } else {
+                if (songIndex + 1 < tracks.size()) {
+                    songIndex++;
+                }
+            }
+        } else if (viewId == R.id.preview) {
+            if (isRandomChange) {
+                songIndex = random.nextInt(tracks.size());
+            } else {
+                if (songIndex - 1 >= 0) {
+                    songIndex--;
+                }
+            }
+        }
+
+        try {
+            songChanger();
+        } catch (IOException e) {
+            Log.e("IOException", e.getMessage());
+        }
+    }
+
+    public void clickEvents(View view) {
+        int viewId = view.getId();
+
+        if (viewId == R.id.trackName) {
+            Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
+            trackInfoActivity.putExtra("track name", ((TextView) view).getText());
+            startActivity(trackInfoActivity);
+        } else if (viewId == R.id.controlButton) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                ((ImageButton) view).setImageResource(R.drawable.play);
+            } else {
+                mediaPlayer.start();
+                ((ImageButton) view).setImageResource(R.drawable.pause);
+            }
+        } else if (viewId == R.id.repeat) {
+            if (mediaPlayer.isLooping()) {
+                mediaPlayer.setLooping(false);
+            } else {
+                mediaPlayer.setLooping(true);
+            }
+            isLooping = mediaPlayer.isLooping();
+        } else if (viewId == R.id.nextMode) {
+            isRandomChange = !isRandomChange;
+        }
     }
 }
