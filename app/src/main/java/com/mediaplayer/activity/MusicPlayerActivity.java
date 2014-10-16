@@ -11,6 +11,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -91,7 +93,6 @@ public class MusicPlayerActivity extends Activity {
 
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
-                        ((ImageButton) (findViewById(R.id.controlButton))).setImageResource(R.drawable.play);
                         //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
                         //TODO Линк за отваряне на галерия със снимки
 
@@ -167,6 +168,9 @@ public class MusicPlayerActivity extends Activity {
                 }
             };
 
+            Animation hyperspaceJump = AnimationUtils.loadAnimation(this, R.anim.move);
+            trackName.startAnimation(hyperspaceJump);
+
             int duration = mediaPlayer.getDuration();
             trackDuration.setText(String.format("%02d:%02d",
                     TimeUnit.MILLISECONDS.toMinutes(duration),
@@ -216,17 +220,12 @@ public class MusicPlayerActivity extends Activity {
 
         handler.removeCallbacks(runnable);
         if (mediaPlayer != null) {
+            saveSettings.saveSettings(SAVE_LOOPING, mediaPlayer.isLooping());
+            saveSettings.saveSettings(SAVE_RANDOM_MODE, isRandomChange);
+
             mediaPlayer.release();
             mediaPlayer = null;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        saveSettings.saveSettings(SAVE_LOOPING, mediaPlayer.isLooping());
-        saveSettings.saveSettings(SAVE_RANDOM_MODE, isRandomChange);
     }
 
     private void songChanger() throws IOException {
