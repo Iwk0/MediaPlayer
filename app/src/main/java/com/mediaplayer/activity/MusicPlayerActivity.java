@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by imishev on 15.10.2014 г..
- */
 public class MusicPlayerActivity extends Activity {
 
     private static final String TRACKS_PATH = "tracks path";
@@ -42,7 +39,6 @@ public class MusicPlayerActivity extends Activity {
 
     private MediaPlayer mediaPlayer;
     private List<Track> tracks;
-    private Bundle extras;
     private Image image;
     private Runnable runnable;
     private Handler handler;
@@ -73,7 +69,7 @@ public class MusicPlayerActivity extends Activity {
         //Allow music volume control
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        extras = getIntent().getExtras();
+        Bundle extras = getIntent().getExtras();
         if (extras != null) {
             tracks = extras.getParcelableArrayList(TRACKS_PATH);
             String path = extras.getString(TRACK_PATH);
