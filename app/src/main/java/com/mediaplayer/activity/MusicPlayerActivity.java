@@ -225,7 +225,7 @@ public class MusicPlayerActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
-        saveSettings.saveSettings(SAVE_LOOPING, isLooping);
+        saveSettings.saveSettings(SAVE_LOOPING, mediaPlayer.isLooping());
         saveSettings.saveSettings(SAVE_RANDOM_MODE, isRandomChange);
     }
 
@@ -302,7 +302,6 @@ public class MusicPlayerActivity extends Activity {
             } else {
                 mediaPlayer.setLooping(true);
             }
-            isLooping = mediaPlayer.isLooping();
         } else if (viewId == R.id.nextMode) {
             isRandomChange = !isRandomChange;
         }
