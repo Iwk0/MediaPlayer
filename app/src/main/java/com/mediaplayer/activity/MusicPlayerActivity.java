@@ -222,7 +222,6 @@ public class MusicPlayerActivity extends Activity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         handler.removeCallbacks(runnable);
 
         if (mediaPlayer != null) {
@@ -325,6 +324,16 @@ public class MusicPlayerActivity extends Activity {
             }
 
             isRandomChange = !isRandomChange;
+        } else if (viewId == R.id.playlist) {
+            if (mediaPlayer != null) {
+                handler.removeCallbacks(runnable);
+
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+
+            Intent trackInfoActivity = new Intent(getApplicationContext(), TrackListActivity.class);
+            startActivity(trackInfoActivity);
         }
     }
 }
