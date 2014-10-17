@@ -11,7 +11,8 @@
         android:textSize="20sp"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/trackName" />
+        android:id="@+id/trackName"
+        android:onClick="clickEvents" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -113,7 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:id="@+id/nextMode"
+            android:id="@+id/randomMode"
             android:src="@drawable/random"
             android:onClick="clickEvents" />
 

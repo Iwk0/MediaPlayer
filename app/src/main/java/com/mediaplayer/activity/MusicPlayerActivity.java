@@ -68,6 +68,14 @@ public class MusicPlayerActivity extends Activity {
         isRandomChange = saveSettings.loadSettings(SAVE_RANDOM_MODE, false);
         isLooping = saveSettings.loadSettings(SAVE_LOOPING, true);
 
+        if (isLooping) {
+            ((ImageButton) findViewById(R.id.repeat)).setImageResource(R.drawable.repeat_pressed);
+        }
+
+        if (isRandomChange) {
+            ((ImageButton) findViewById(R.id.randomMode)).setImageResource(R.drawable.random_pressed);
+        }
+
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.image);
@@ -211,6 +219,7 @@ public class MusicPlayerActivity extends Activity {
         handler.post(runnable);
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
+        animation.setRepeatCount(Animation.INFINITE);
         trackName.startAnimation(animation);
     }
 
@@ -219,6 +228,7 @@ public class MusicPlayerActivity extends Activity {
         super.onBackPressed();
 
         handler.removeCallbacks(runnable);
+
         if (mediaPlayer != null) {
             saveSettings.saveSettings(SAVE_LOOPING, mediaPlayer.isLooping());
             saveSettings.saveSettings(SAVE_RANDOM_MODE, isRandomChange);
@@ -298,10 +308,20 @@ public class MusicPlayerActivity extends Activity {
         } else if (viewId == R.id.repeat) {
             if (mediaPlayer.isLooping()) {
                 mediaPlayer.setLooping(false);
+                ((ImageButton) view).setImageResource(R.drawable.repeat);
             } else {
                 mediaPlayer.setLooping(true);
+                ((ImageButton) view).setImageResource(R.drawable.repeat_pressed);
             }
-        } else if (viewId == R.id.nextMode) {
+
+            isLooping = mediaPlayer.isLooping();
+        } else if (viewId == R.id.randomMode) {
+            if (isRandomChange) {
+                ((ImageButton) view).setImageResource(R.drawable.random);
+            } else {
+                ((ImageButton) view).setImageResource(R.drawable.random_pressed);
+            }
+
             isRandomChange = !isRandomChange;
         }
     }
