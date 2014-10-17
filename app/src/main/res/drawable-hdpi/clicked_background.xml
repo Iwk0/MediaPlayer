@@ -5,11 +5,14 @@
     <item android:drawable="@drawable/pressed_background_track_list"
         android:state_focused="true"
         android:state_pressed="true" />
+
     <item android:drawable="@drawable/pressed_background_track_list"
         android:state_focused="false"
         android:state_pressed="true" />
+
     <item android:drawable="@drawable/pressed_background_track_list"
         android:state_focused="true" />
+
     <item android:drawable="@drawable/background_track_list"
         android:state_focused="false"
         android:state_pressed="false" />

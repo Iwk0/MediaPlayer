@@ -101,9 +101,6 @@ public class MusicPlayerActivity extends Activity {
 
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
-                        //http://stackoverflow.com/questions/2169649/get-pick-an-image-from-androids-built-in-gallery-app-programmatically
-                        //TODO Линк за отваряне на галерия със снимки
-
                         if (isRandomChange) {
                             Random random = new Random();
                             songIndex = random.nextInt(tracks.size());
@@ -112,7 +109,7 @@ public class MusicPlayerActivity extends Activity {
                         }
 
                         try {
-                            songChanger();
+                            trackChanger();
                         } catch (IOException e) {
                             Log.e("IOException", e.getMessage());
                         }
@@ -219,7 +216,6 @@ public class MusicPlayerActivity extends Activity {
         handler.post(runnable);
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
-        animation.setRepeatCount(Animation.INFINITE);
         trackName.startAnimation(animation);
     }
 
@@ -238,12 +234,17 @@ public class MusicPlayerActivity extends Activity {
         }
     }
 
-    private void songChanger() throws IOException {
+    private void trackChanger() throws IOException {
+        boolean isPlaying = mediaPlayer.isPlaying();
+
         mediaPlayer.reset();
         mediaPlayer.setDataSource(tracks.get(songIndex).getPath());
         mediaPlayer.prepare();
-        mediaPlayer.start();
         mediaPlayer.setLooping(isLooping);
+
+        if (isPlaying) {
+            mediaPlayer.start();
+        }
 
         trackName.setText(tracks.get(songIndex).getName());
 
@@ -284,7 +285,7 @@ public class MusicPlayerActivity extends Activity {
         }
 
         try {
-            songChanger();
+            trackChanger();
         } catch (IOException e) {
             Log.e("IOException", e.getMessage());
         }
@@ -301,10 +302,10 @@ public class MusicPlayerActivity extends Activity {
         } else if (viewId == R.id.controlButton) {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
-                ((ImageButton) view).setImageResource(R.drawable.play);
+                ((ImageButton) view).setImageResource(R.drawable.clicked_play);
             } else {
                 mediaPlayer.start();
-                ((ImageButton) view).setImageResource(R.drawable.pause);
+                ((ImageButton) view).setImageResource(R.drawable.clicked_pause);
             }
         } else if (viewId == R.id.repeat) {
             if (mediaPlayer.isLooping()) {

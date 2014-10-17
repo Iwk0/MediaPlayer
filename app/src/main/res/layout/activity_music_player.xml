@@ -50,16 +50,36 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="@string/current_time"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/currentTime" />
+            android:id="@+id/currentTime"
+            android:layout_toRightOf="@+id/repeat" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/randomMode"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_alignParentRight="true"
             android:id="@+id/songDuration" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:id="@+id/repeat"
+            android:src="@drawable/repeat"
+            android:onClick="clickEvents" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:id="@+id/randomMode"
+            android:src="@drawable/random"
+            android:onClick="clickEvents"
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout >
 
@@ -83,42 +103,23 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:id="@+id/repeat"
-            android:src="@drawable/repeat"
-            android:onClick="clickEvents" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
+            android:background="@drawable/clicked_rewind"
             android:id="@+id/preview"
-            android:src="@drawable/back"
             android:onClick="changeTrackEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
+            android:background="@drawable/clicked_pause"
             android:id="@+id/controlButton"
-            android:src="@drawable/pause"
             android:onClick="clickEvents" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
+            android:background="@drawable/clicked_forward"
             android:id="@+id/next"
-            android:src="@drawable/forward"
             android:onClick="changeTrackEvents" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:id="@+id/randomMode"
-            android:src="@drawable/random"
-            android:onClick="clickEvents" />
 
     </LinearLayout>
 
