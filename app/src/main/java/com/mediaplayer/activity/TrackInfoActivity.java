@@ -18,5 +18,7 @@ public class TrackInfoActivity extends Activity {
         if (extras != null) {
             trackName.setText(extras.getString("track name"));
         }
+
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

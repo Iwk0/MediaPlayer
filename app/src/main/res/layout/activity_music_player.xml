@@ -6,13 +6,14 @@
     tools:context="com.mediaplayer.activity.MusicPlayerActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textSize="20sp"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/trackName"
-        android:onClick="clickEvents" />
+        android:onClick="clickEvents"
+        android:clickable="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -49,6 +50,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/current_time"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/currentTime" />
 
@@ -74,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:gravity="center"
-        android:background="@drawable/control_background"
+        android:background="@drawable/background_track_list"
         android:layout_alignParentBottom="true"
         android:id="@+id/menu">
 

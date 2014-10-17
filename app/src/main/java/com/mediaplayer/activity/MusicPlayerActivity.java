@@ -296,6 +296,7 @@ public class MusicPlayerActivity extends Activity {
         if (viewId == R.id.trackName) {
             Intent trackInfoActivity = new Intent(getApplicationContext(), TrackInfoActivity.class);
             trackInfoActivity.putExtra("track name", ((TextView) view).getText());
+            //trackInfoActivity.putExtra("", trackDuration.getText());
             startActivity(trackInfoActivity);
         } else if (viewId == R.id.controlButton) {
             if (mediaPlayer.isPlaying()) {
