@@ -275,19 +275,25 @@ public class MusicPlayerActivity extends Activity {
 
         if (viewId == R.id.next) {
             if (isRandomChange) {
-                trackIndex = random.nextInt(tracks.size());
-                recentlyPlayedTracks.add(tracks.get(trackIndex).getPath());
-                recentlyPlayed.add(recentlyPlayedTracks.getLastPathTrack());
+                if (trackIndex + 1 < recentlyPlayed.size()) {
+                    try {
+                        trackChanger(recentlyPlayed.get(++trackIndex));
+                    } catch (IOException e) {
+                        Log.e("IOException", e.getMessage());
+                    }
+                } else {
+                    trackIndex = random.nextInt(tracks.size());
+                    recentlyPlayedTracks.add(tracks.get(trackIndex).getPath());
+                    recentlyPlayed.add(recentlyPlayedTracks.getLastPathTrack());
+                }
             } else {
                 if (trackIndex + 1 < tracks.size()) {
-                    trackIndex++;
+                    try {
+                        trackChanger(tracks.get(++trackIndex).getPath());
+                    } catch (IOException e) {
+                        Log.e("IOException", e.getMessage());
+                    }
                 }
-            }
-
-            try {
-                trackChanger(tracks.get(trackIndex).getPath());
-            } catch (IOException e) {
-                Log.e("IOException", e.getMessage());
             }
         } else if (viewId == R.id.preview) {
             if (isRandomChange) {
