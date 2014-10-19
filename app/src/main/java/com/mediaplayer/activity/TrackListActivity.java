@@ -16,15 +16,20 @@ import android.widget.TextView;
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.RecentlyPlayedTracks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TrackListActivity extends Activity {
 
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";
     private static final String TRACK_NAME = "track name";
+    private static final String RECENTLY_PLAYED = "recently played";
 
+    private ArrayList<String> recentlyPlayed;
+    private RecentlyPlayedTracks recentlyPlayedTracks;
     private ProgressBar progressBar;
 
     @Override
@@ -32,6 +37,7 @@ public class TrackListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_list);
 
+        recentlyPlayedTracks = new RecentlyPlayedTracks(this);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
@@ -58,6 +64,7 @@ public class TrackListActivity extends Activity {
                         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
+                        intent.putStringArrayListExtra(RECENTLY_PLAYED, recentlyPlayed);
                         intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
 
                         startActivity(intent);
@@ -69,6 +76,8 @@ public class TrackListActivity extends Activity {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
+                recentlyPlayed = recentlyPlayedTracks.getAllTracks();
+
                 ArrayList<Track> tracks = new ArrayList<Track>();
 
                 String[] type = {
