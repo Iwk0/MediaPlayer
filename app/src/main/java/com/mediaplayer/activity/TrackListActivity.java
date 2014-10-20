@@ -28,7 +28,7 @@ public class TrackListActivity extends Activity {
     private static final String TRACK_NAME = "track name";
     private static final String RECENTLY_PLAYED = "recently played";
 
-    private ArrayList<String> recentlyPlayed;
+    private ArrayList<Track> recentlyPlayed;
     private RecentlyPlayedTracks recentlyPlayedTracks;
     private ProgressBar progressBar;
 
@@ -64,7 +64,7 @@ public class TrackListActivity extends Activity {
                         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
-                        intent.putStringArrayListExtra(RECENTLY_PLAYED, recentlyPlayed);
+                        intent.putParcelableArrayListExtra(RECENTLY_PLAYED, recentlyPlayed);
                         intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
 
                         startActivity(intent);

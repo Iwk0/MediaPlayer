@@ -104,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/clicked_rewind"
-            android:id="@+id/preview"
+            android:id="@+id/previous"
             android:onClick="changeTrackEvents"
             android:layout_alignBottom="@+id/controlButton"
             android:layout_toLeftOf="@+id/controlButton" />

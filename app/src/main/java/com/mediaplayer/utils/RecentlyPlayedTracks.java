@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.mediaplayer.model.Track;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +16,12 @@ import java.util.List;
  */
 public class RecentlyPlayedTracks extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 20;
     private static final String DATABASE_NAME = "recentlyPlayedTracks";
-    private static final String TABLE_PATHS = "paths";
-    private static final String KEY_ID = "id";
-    private static final String KEY_PATH = "path";
+    private static final String TABLE_NAME = "paths";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_PATH = "path";
+    private static final String COLUMN_NAME = "name";
 
     public RecentlyPlayedTracks(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,45 +29,49 @@ public class RecentlyPlayedTracks extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PATHS + "("
-                + KEY_ID + " INTEGER AUTOINCREMENT PRIMARY KEY," + KEY_PATH + " TEXT)";
+        String CREATE_CONTACTS_TABLE = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT NOT NULL, %s TEXT NOT NULL);",
+                TABLE_NAME,
+                COLUMN_ID,
+                COLUMN_NAME,
+                COLUMN_PATH);
         database.execSQL(CREATE_CONTACTS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_PATHS);
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(database);
     }
 
-    public void add(String path) {
+    public void add(Track track) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_PATH, path);
+        values.put(COLUMN_NAME, track.getName());
+        values.put(COLUMN_PATH, track.getPath());
 
-        db.insert(TABLE_PATHS, null, values);
+        db.insert(TABLE_NAME, null, values);
         db.close();
     }
 
-    public ArrayList<String> getAllTracks() {
-        ArrayList<String> contactList = new ArrayList<String>();
+    public ArrayList<Track> getAllTracks() {
+        ArrayList<Track> trackArrayList = new ArrayList<Track>();
 
-        String selectQuery = "SELECT * FROM " + TABLE_PATHS;
+        String selectQuery = String.format("SELECT * FROM %s", TABLE_NAME);
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                contactList.add(cursor.getString(1));
+                trackArrayList.add(new Track(cursor.getString(1), cursor.getString(2)));
             } while (cursor.moveToNext());
         }
 
-        return contactList;
+        return trackArrayList;
     }
 
-    public String getLastPathTrack() {
+/*    public String getLastPathTrack() {
         Cursor cursor = null;
         String path = "";
         SQLiteDatabase db = this.getWritableDatabase();
@@ -83,5 +90,5 @@ public class RecentlyPlayedTracks extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-    }
+    }*/
 }
