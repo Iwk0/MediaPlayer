@@ -43,7 +43,6 @@ public class MusicPlayerActivity extends Activity {
     private static final String TRACK_NAME = "track name";
     private static final String SAVE_LOOPING = "looping";
     private static final String SAVE_RANDOM_MODE = "random mode";
-    private static final String SAVE_SHUFFLE_INDEX = "save shuffle index";
     private static final String RECENTLY_PLAYED = "recently played";
     private static final String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 
@@ -110,38 +109,7 @@ public class MusicPlayerActivity extends Activity {
 
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
-                        if (shuffleMode) {
-                            if (shuffleIndex + 1 < recentlyPlayed.size()) {
-                                try {
-                                    Track track = recentlyPlayed.get(++shuffleIndex);
-                                    trackChanger(track.getPath(), track.getName());
-                                } catch (IOException e) {
-                                    Log.e("IOException", e.getMessage());
-                                }
-                            } else {
-                                Random random = new Random();
-                                trackIndex = random.nextInt(tracks.size());
-
-                                Track track = tracks.get(trackIndex);
-                                recentlyPlayedTracks.add(track);
-                                recentlyPlayed.add(track);
-                                shuffleIndex = recentlyPlayed.size() - 1;
-
-                                try {
-                                    trackChanger(track.getPath(), track.getName());
-                                } catch (IOException e) {
-                                    Log.e("IOException", e.getMessage());
-                                }
-                            }
-                        } else {
-                            trackIndex++;
-
-                            try {
-                                trackChanger(tracks.get(trackIndex).getPath(), tracks.get(trackIndex).getName());
-                            } catch (IOException e) {
-                                Log.e("IOException", e.getMessage());
-                            }
-                        }
+                        changeTrackNext();
                     }
                 });
 
@@ -269,6 +237,94 @@ public class MusicPlayerActivity extends Activity {
         }
     }
 
+    private void changeTrackNext() {
+        if (shuffleMode) {
+            if (shuffleIndex + 1 < recentlyPlayed.size()) {
+                try {
+                    Track track = recentlyPlayed.get(++shuffleIndex);
+                    trackChanger(track.getPath(), track.getName());
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+            } else {
+                Random random = new Random();
+                trackIndex = random.nextInt(tracks.size());
+
+                Track track = tracks.get(trackIndex);
+                recentlyPlayedTracks.add(track);
+                recentlyPlayed.add(track);
+                shuffleIndex = recentlyPlayed.size() - 1;
+
+                try {
+                    trackChanger(track.getPath(), track.getName());
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+            }
+        } else {
+            trackIndex++;
+
+            try {
+                trackChanger(tracks.get(trackIndex).getPath(), tracks.get(trackIndex).getName());
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            }
+        }
+    }
+
+    private void changeTrackPrevious() {
+        if (shuffleMode) {
+            Random random = new Random();
+
+            if (recentlyPlayed.size() > 1 && shuffleIndex > 0) {
+                File recentlyTrack;
+                String trackPath = "", trackName = "";
+
+                do {
+                    Track track = recentlyPlayed.get(--shuffleIndex);
+                    trackPath = track.getPath();
+                    trackName = track.getName();
+                    recentlyTrack = new File(trackPath);
+                } while (!recentlyTrack.exists() && shuffleIndex > 0);
+
+                if (trackPath.equals("")) {
+                    trackIndex = random.nextInt(tracks.size());
+                    Track track = tracks.get(trackIndex);
+                    trackPath = track.getPath();
+                    trackName = track.getName();
+                }
+
+                try {
+                    trackChanger(trackPath, trackName);
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+            } else {
+                trackIndex = random.nextInt(tracks.size());
+
+                Track track = tracks.get(trackIndex);
+                recentlyPlayedTracks.add(track);
+                recentlyPlayed.add(0, track);
+                shuffleIndex = 0;
+
+                try {
+                    trackChanger(track.getPath(), track.getName());
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+            }
+        } else {
+            if (trackIndex - 1 >= 0) {
+                try {
+                    Track track = tracks.get(--trackIndex);
+                    trackChanger(track.getPath(), track.getName());
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+            }
+        }
+    }
+
     private void trackChanger(String path, String track) throws IOException {
         mediaPlayer.reset();
         mediaPlayer.setDataSource(path);
@@ -297,90 +353,11 @@ public class MusicPlayerActivity extends Activity {
 
     public void changeTrackEvents(View view) {
         int viewId = view.getId();
-        Random random = new Random();
 
         if (viewId == R.id.next) {
-            if (shuffleMode) {
-                if (shuffleIndex + 1 < recentlyPlayed.size()) {
-                    try {
-                        Track track = recentlyPlayed.get(++shuffleIndex);
-                        trackChanger(track.getPath(), track.getName());
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                } else {
-                    trackIndex = random.nextInt(tracks.size());
-
-                    Track track = tracks.get(trackIndex);
-                    recentlyPlayedTracks.add(track);
-                    recentlyPlayed.add(track);
-                    shuffleIndex = recentlyPlayed.size() - 1;
-
-                    try {
-                        trackChanger(track.getPath(), track.getName());
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            } else {
-                if (trackIndex + 1 < tracks.size()) {
-                    try {
-                        Track track = tracks.get(++trackIndex);
-                        trackChanger(track.getPath(), track.getName());
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            }
+            changeTrackNext();
         } else if (viewId == R.id.previous) {
-            if (shuffleMode) {
-                if (recentlyPlayed.size() > 1 && shuffleIndex > 0) {
-                    File recentlyTrack;
-                    String trackPath = "", trackName = "";
-
-                    do {
-                        Track track = recentlyPlayed.get(--shuffleIndex);
-                        trackPath = track.getPath();
-                        trackName = track.getName();
-                        recentlyTrack = new File(trackPath);
-                    } while (!recentlyTrack.exists() && shuffleIndex > 0);
-
-                    if (trackPath.equals("")) {
-                        trackIndex = random.nextInt(tracks.size());
-                        Track track = tracks.get(trackIndex);
-                        trackPath = track.getPath();
-                        trackName = track.getName();
-                    }
-
-                    try {
-                        trackChanger(trackPath, trackName);
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                } else {
-                    trackIndex = random.nextInt(tracks.size());
-
-                    Track track = tracks.get(trackIndex);
-                    recentlyPlayedTracks.add(track);
-                    recentlyPlayed.add(0, track);
-                    shuffleIndex = 0;
-
-                    try {
-                        trackChanger(track.getPath(), track.getName());
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            } else {
-                if (trackIndex - 1 >= 0) {
-                    try {
-                        Track track = tracks.get(--trackIndex);
-                        trackChanger(track.getPath(), track.getName());
-                    } catch (IOException e) {
-                        Log.e("IOException", e.getMessage());
-                    }
-                }
-            }
+            changeTrackPrevious();
         }
     }
 
