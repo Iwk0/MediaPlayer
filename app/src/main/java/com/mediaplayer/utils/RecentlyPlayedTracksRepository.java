@@ -14,16 +14,16 @@ import java.util.List;
 /**
  * Created by imishev on 26.9.2014 г..
  */
-public class RecentlyPlayedTracks extends SQLiteOpenHelper {
+public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 22;
     private static final String DATABASE_NAME = "recentlyPlayedTracks";
     private static final String TABLE_NAME = "paths";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_PATH = "path";
     private static final String COLUMN_NAME = "name";
 
-    public RecentlyPlayedTracks(Context context) {
+    public RecentlyPlayedTracksRepository(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -70,25 +70,4 @@ public class RecentlyPlayedTracks extends SQLiteOpenHelper {
 
         return trackArrayList;
     }
-
-/*    public String getLastPathTrack() {
-        Cursor cursor = null;
-        String path = "";
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            cursor = db.rawQuery("SELECT * FROM paths ORDER BY id DESC LIMIT 1", null);
-
-            if(cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                path = cursor.getString(cursor.getColumnIndex("path"));
-            }
-
-            return path;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }*/
 }

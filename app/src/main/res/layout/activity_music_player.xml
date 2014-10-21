@@ -13,9 +13,7 @@
         android:textStyle="bold"
         android:id="@+id/trackName"
         android:onClick="clickEvents"
-        android:clickable="true"
-        android:ellipsize="end"
-        android:singleLine="true" />
+        android:clickable="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"

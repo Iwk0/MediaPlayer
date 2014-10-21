@@ -16,10 +16,9 @@ import android.widget.TextView;
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
-import com.mediaplayer.utils.RecentlyPlayedTracks;
+import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TrackListActivity extends Activity {
 
@@ -28,8 +27,8 @@ public class TrackListActivity extends Activity {
     private static final String TRACK_NAME = "track name";
     private static final String RECENTLY_PLAYED = "recently played";
 
-    private ArrayList<Track> recentlyPlayed;
-    private RecentlyPlayedTracks recentlyPlayedTracks;
+    private ArrayList<Track> recentlyPlayedTracks;
+    private RecentlyPlayedTracksRepository recentlyPlayedTracksRepository;
     private ProgressBar progressBar;
 
     @Override
@@ -37,7 +36,7 @@ public class TrackListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_list);
 
-        recentlyPlayedTracks = new RecentlyPlayedTracks(this);
+        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(this);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
@@ -64,7 +63,7 @@ public class TrackListActivity extends Activity {
                         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
-                        intent.putParcelableArrayListExtra(RECENTLY_PLAYED, recentlyPlayed);
+                        intent.putParcelableArrayListExtra(RECENTLY_PLAYED, recentlyPlayedTracks);
                         intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
 
                         startActivity(intent);
@@ -76,7 +75,7 @@ public class TrackListActivity extends Activity {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
-                recentlyPlayed = recentlyPlayedTracks.getAllTracks();
+                recentlyPlayedTracks = recentlyPlayedTracksRepository.getAllTracks();
 
                 ArrayList<Track> tracks = new ArrayList<Track>();
 
