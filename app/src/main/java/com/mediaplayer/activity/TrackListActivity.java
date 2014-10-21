@@ -1,12 +1,14 @@
 package com.mediaplayer.activity;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -20,7 +22,7 @@ import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 
 import java.util.ArrayList;
 
-public class TrackListActivity extends Activity {
+public class TrackListActivity extends Fragment {
 
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";
@@ -30,14 +32,14 @@ public class TrackListActivity extends Activity {
     private ArrayList<Track> recentlyPlayedTracks;
     private RecentlyPlayedTracksRepository recentlyPlayedTracksRepository;
     private ProgressBar progressBar;
+    private View view;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_track_list);
 
-        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(this);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        view = inflater.inflate(R.layout.activity_track_list, container, false);
+
+        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(getActivity());
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
 
@@ -51,8 +53,8 @@ public class TrackListActivity extends Activity {
             protected void onPostExecute(final ArrayList<Track> tracks) {
                 super.onPostExecute(tracks);
 
-                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(TrackListActivity.this, R.layout.track_list, tracks);
-                ListView listView = (ListView) findViewById(R.id.songListView);
+                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(getActivity(), R.layout.track_list, tracks);
+                ListView listView = (ListView) view.findViewById(R.id.songListView);
                 listView.setAdapter(loadSongAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -60,7 +62,7 @@ public class TrackListActivity extends Activity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         TextView textViewItem = (TextView) view.findViewById(R.id.songName);
 
-                        Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
+                        Intent intent = new Intent(getActivity(), MusicPlayerActivity.class);
                         intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
                         intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
                         intent.putParcelableArrayListExtra(RECENTLY_PLAYED, recentlyPlayedTracks);
@@ -84,7 +86,7 @@ public class TrackListActivity extends Activity {
                         MediaStore.Audio.Media.DATA,
                         MediaStore.Audio.Media.DISPLAY_NAME };
 
-                Cursor files = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, type, null, null, null);
+                Cursor files = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, type, null, null, null);
 
                 while(files.moveToNext()) {
                     String trackName = files.getString(2);
@@ -94,5 +96,7 @@ public class TrackListActivity extends Activity {
                 return tracks;
             }
         }.execute();
+
+        return view;
     }
 }

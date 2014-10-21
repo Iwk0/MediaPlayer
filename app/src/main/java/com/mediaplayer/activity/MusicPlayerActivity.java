@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MusicPlayerActivity extends Activity {
 
-    private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";
     private static final String TRACK_NAME = "track name";
