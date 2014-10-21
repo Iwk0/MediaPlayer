@@ -9,14 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.mediaplayer.model.Track;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by imishev on 26.9.2014 г..
  */
 public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 25;
+    private static final int DATABASE_VERSION = 29;
     private static final String DATABASE_NAME = "recentlyPlayedTracks";
     private static final String TABLE_NAME = "paths";
     private static final String COLUMN_ID = "id";

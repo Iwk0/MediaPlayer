@@ -412,8 +412,7 @@ public class MusicPlayerActivity extends Activity {
             saveSettings.saveSettings(SAVE_LOOPING, isLooping);
             saveSettings.saveSettings(SAVE_RANDOM_MODE, shuffleMode);
 
-            Intent trackInfoActivity = new Intent(this, MainActivity.class);
-            startActivity(trackInfoActivity);
+            startActivity(new Intent(this, MainActivity.class));
         }
     }
 }

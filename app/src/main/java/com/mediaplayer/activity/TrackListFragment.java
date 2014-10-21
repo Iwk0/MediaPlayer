@@ -34,7 +34,6 @@ public class TrackListFragment extends Fragment {
     private ProgressBar progressBar;
     private View view;
 
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.activity_track_list, container, false);
 

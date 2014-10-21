@@ -6,10 +6,11 @@ import android.app.Fragment;
 import android.os.Bundle;
 
 import com.mediaplayer.R;
-import com.mediaplayer.utils.MyTabListener;
+import com.mediaplayer.utils.TabListener;
 
 public class MainActivity extends Activity {
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
@@ -25,8 +26,8 @@ public class MainActivity extends Activity {
         ActionBar.Tab musicTab = actionBar.newTab().setText("Music");
         ActionBar.Tab playListTab = actionBar.newTab().setText("Play List");
 
-        musicTab.setTabListener(new MyTabListener(music));
-        playListTab.setTabListener(new MyTabListener(playList));
+        musicTab.setTabListener(new TabListener(music));
+        playListTab.setTabListener(new TabListener(playList));
 
         actionBar.addTab(musicTab);
         actionBar.addTab(playListTab);

@@ -10,11 +10,11 @@ import com.mediaplayer.R;
 /**
  * Created by imishev on 21.10.2014 г..
  */
-public class MyTabListener implements ActionBar.TabListener {
+public class TabListener implements ActionBar.TabListener {
 
     private Fragment fragment;
 
-    public MyTabListener(Fragment fragment) {
+    public TabListener(Fragment fragment) {
         this.fragment = fragment;
     }
 
