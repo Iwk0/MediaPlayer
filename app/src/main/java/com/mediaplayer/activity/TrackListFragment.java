@@ -22,7 +22,7 @@ import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 
 import java.util.ArrayList;
 
-public class TrackListActivity extends Fragment {
+public class TrackListFragment extends Fragment {
 
     private static final String TRACKS_PATH = "tracks path";
     private static final String TRACK_PATH = "track path";

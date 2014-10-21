@@ -11,7 +11,7 @@ import com.mediaplayer.R;
 /**
  * Created by imishev on 21.10.2014 г..
  */
-public class PlayList extends Fragment {
+public class PlayListFragment extends Fragment {
 
     private View view;
 

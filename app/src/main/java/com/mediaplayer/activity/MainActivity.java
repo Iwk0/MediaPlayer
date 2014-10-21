@@ -14,8 +14,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
 
-        Fragment music = new TrackListActivity();
-        Fragment playList = new PlayList();
+        Fragment music = new TrackListFragment();
+        Fragment playList = new PlayListFragment();
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
