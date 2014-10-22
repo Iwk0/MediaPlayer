@@ -15,30 +15,23 @@ import java.util.ArrayList;
  */
 public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 29;
-    private static final String DATABASE_NAME = "recentlyPlayedTracks";
-    private static final String TABLE_NAME = "paths";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_PATH = "path";
-    private static final String COLUMN_NAME = "name";
-
     public RecentlyPlayedTracksRepository(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        String CREATE_CONTACTS_TABLE = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT NOT NULL, %s TEXT NOT NULL);",
-                TABLE_NAME,
-                COLUMN_ID,
-                COLUMN_NAME,
-                COLUMN_PATH);
-        database.execSQL(CREATE_CONTACTS_TABLE);
+        String createTable = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT NOT NULL, %s TEXT NOT NULL);",
+                Constants.TABLE_NAME,
+                Constants.COLUMN_ID,
+                Constants.COLUMN_NAME,
+                Constants.COLUMN_PATH);
+        database.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        database.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
         onCreate(database);
     }
 
@@ -46,17 +39,17 @@ public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, track.getName());
-        values.put(COLUMN_PATH, track.getPath());
+        values.put(Constants.COLUMN_NAME, track.getName());
+        values.put(Constants.COLUMN_PATH, track.getPath());
 
-        db.insert(TABLE_NAME, null, values);
+        db.insert(Constants.TABLE_NAME, null, values);
         db.close();
     }
 
     public ArrayList<Track> getAllTracks() {
         ArrayList<Track> trackArrayList = new ArrayList<Track>();
 
-        String selectQuery = String.format("SELECT * FROM %s", TABLE_NAME);
+        String selectQuery = String.format("SELECT * FROM %s", Constants.TABLE_NAME);
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.mediaplayer.R;
 import com.mediaplayer.model.Image;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.ImageResize;
 import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 import com.mediaplayer.utils.SaveSettings;
@@ -36,14 +37,6 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MusicPlayerActivity extends Activity {
-
-    private static final String TRACKS_PATH = "tracks path";
-    private static final String TRACK_PATH = "track path";
-    private static final String TRACK_NAME = "track name";
-    private static final String SAVE_LOOPING = "looping";
-    private static final String SAVE_RANDOM_MODE = "random mode";
-    private static final String RECENTLY_PLAYED = "recently played";
-    private static final String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 
     private MediaPlayer mediaPlayer;
     private List<Track> tracks;
@@ -71,8 +64,8 @@ public class MusicPlayerActivity extends Activity {
 
         recentlyPlayedTracksTracksRepository = new RecentlyPlayedTracksRepository(this);
         saveSettings = new SaveSettings(this);
-        shuffleMode = saveSettings.loadSettings(SAVE_RANDOM_MODE, false);
-        isLooping = saveSettings.loadSettings(SAVE_LOOPING, true);
+        shuffleMode = saveSettings.loadSettings(Constants.SAVE_RANDOM_MODE, false);
+        isLooping = saveSettings.loadSettings(Constants.SAVE_LOOPING, true);
 
         if (isLooping) {
             ((ImageButton) findViewById(R.id.repeat)).setImageResource(R.drawable.repeat_pressed);
@@ -94,10 +87,10 @@ public class MusicPlayerActivity extends Activity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            tracks = extras.getParcelableArrayList(TRACKS_PATH);
-            trackName.setText(extras.getString(TRACK_NAME));
-            recentlyPlayedTracks = extras.getParcelableArrayList(RECENTLY_PLAYED);
-            String path = extras.getString(TRACK_PATH);
+            tracks = extras.getParcelableArrayList(Constants.TRACKS_PATH);
+            trackName.setText(extras.getString(Constants.TRACK_NAME));
+            recentlyPlayedTracks = extras.getParcelableArrayList(Constants.RECENTLY_PLAYED);
+            String path = extras.getString(Constants.TRACK_PATH);
 
             try {
                 mediaPlayer = new MediaPlayer();
@@ -131,8 +124,13 @@ public class MusicPlayerActivity extends Activity {
 
             if (shuffleMode) {
                 Track track = new Track(tracks.get(trackIndex).getName(), tracks.get(trackIndex).getPath());
-                recentlyPlayedTracksTracksRepository.add(track);
-                recentlyPlayedTracks.add(track);
+                final int SIZE = recentlyPlayedTracks.size();
+
+                if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
+                    recentlyPlayedTracksTracksRepository.add(track);
+                    recentlyPlayedTracks.add(track);
+                }
+
                 shuffleIndex = recentlyPlayedTracks.size() - 1;
             }
 
@@ -167,7 +165,7 @@ public class MusicPlayerActivity extends Activity {
 
                             @Override
                             protected Bitmap doInBackground(Void... voids) {
-                                return ImageResize.decodeSampledBitmapFromUri(STORAGE_PATH + image.getPaths().get(newIndex), 250, 250);
+                                return ImageResize.decodeSampledBitmapFromUri(Constants.STORAGE_PATH + image.getPaths().get(newIndex), 250, 250);
                             }
                         }.execute();
                     }
@@ -177,11 +175,7 @@ public class MusicPlayerActivity extends Activity {
             };
 
             int duration = mediaPlayer.getDuration();
-            trackDuration.setText(String.format("%02d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(duration),
-                    TimeUnit.MILLISECONDS.toSeconds(duration) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-            ));
+            trackDuration.setText(timeFormat(duration));
 
             seekBar.setMax(duration);
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -192,11 +186,7 @@ public class MusicPlayerActivity extends Activity {
                         mediaPlayer.seekTo(i);
                     }
 
-                    currentTime.setText(String.format("%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(i),
-                            TimeUnit.MILLISECONDS.toSeconds(i) -
-                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(i))
-                    ));
+                    currentTime.setText(timeFormat(i));
                 }
 
                 @Override
@@ -209,17 +199,12 @@ public class MusicPlayerActivity extends Activity {
 
                 }
             });
+
+            mediaPlayer.start();
+            handler.post(runnable);
+
+            animationReset();
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mediaPlayer.start();
-        handler.post(runnable);
-
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
-        trackName.startAnimation(animation);
     }
 
     @Override
@@ -227,127 +212,156 @@ public class MusicPlayerActivity extends Activity {
         super.onBackPressed();
         handler.removeCallbacks(runnable);
 
-        saveSettings.saveSettings(SAVE_LOOPING, isLooping);
-        saveSettings.saveSettings(SAVE_RANDOM_MODE, shuffleMode);
+        saveSettings.saveSettings(Constants.SAVE_LOOPING, isLooping);
+        saveSettings.saveSettings(Constants.SAVE_RANDOM_MODE, shuffleMode);
 
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     private void changeTrackNext() {
-        if (shuffleMode) {
-            if (shuffleIndex + 1 < recentlyPlayedTracks.size()) {
-                try {
-                    Track track = recentlyPlayedTracks.get(++shuffleIndex);
-                    trackChanger(track.getPath(), track.getName());
-                } catch (IOException e) {
-                    Log.e("IOException", e.getMessage());
-                }
-            } else {
-                Random random = new Random();
-                trackIndex = random.nextInt(tracks.size());
+        new Thread(new Runnable() {
 
-                Track track = tracks.get(trackIndex);
-                recentlyPlayedTracksTracksRepository.add(track);
-                recentlyPlayedTracks.add(track);
-                shuffleIndex = recentlyPlayedTracks.size() - 1;
+            @Override
+            public void run() {
+                if (shuffleMode) {
+                    if (shuffleIndex + 1 < recentlyPlayedTracks.size()) {
+                        Track track = recentlyPlayedTracks.get(++shuffleIndex);
+                        trackChanger(track.getPath(), track.getName());
+                    } else {
+                        Random random = new Random();
+                        trackIndex = random.nextInt(tracks.size());
 
-                try {
-                    trackChanger(track.getPath(), track.getName());
-                } catch (IOException e) {
-                    Log.e("IOException", e.getMessage());
+                        Track track = tracks.get(trackIndex);
+                        final int SIZE = recentlyPlayedTracks.size();
+
+                        while (recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
+                            trackIndex = random.nextInt(tracks.size());
+                            track = tracks.get(trackIndex);
+                        }
+
+                        recentlyPlayedTracksTracksRepository.add(track);
+                        recentlyPlayedTracks.add(track);
+
+                        shuffleIndex = recentlyPlayedTracks.size() - 1;
+
+                        trackChanger(track.getPath(), track.getName());
+                    }
+                } else {
+                    trackIndex++;
+                    trackChanger(tracks.get(trackIndex).getPath(), tracks.get(trackIndex).getName());
                 }
             }
-        } else {
-            trackIndex++;
-
-            try {
-                trackChanger(tracks.get(trackIndex).getPath(), tracks.get(trackIndex).getName());
-            } catch (IOException e) {
-                Log.e("IOException", e.getMessage());
-            }
-        }
+        }).start();
     }
 
     private void changeTrackPrevious() {
-        if (shuffleMode) {
-            Random random = new Random();
+        new Thread(new Runnable() {
 
-            if (recentlyPlayedTracks.size() > 1 && shuffleIndex > 0) {
-                File recentlyTrack;
-                String trackPath = "", trackName = "";
+            @Override
+            public void run() {
+                if (shuffleMode) {
+                    Random random = new Random();
 
-                do {
-                    Track track = recentlyPlayedTracks.get(--shuffleIndex);
-                    trackPath = track.getPath();
-                    trackName = track.getName();
-                    recentlyTrack = new File(trackPath);
-                } while (!recentlyTrack.exists() && shuffleIndex > 0);
+                    if (recentlyPlayedTracks.size() > 1 && shuffleIndex > 0) {
+                        File recentlyTrack;
+                        String trackPath, trackName;
 
-                if (trackPath.isEmpty()) {
-                    trackIndex = random.nextInt(tracks.size());
-                    Track track = tracks.get(trackIndex);
-                    trackPath = track.getPath();
-                    trackName = track.getName();
-                }
+                        do {
+                            Track track = recentlyPlayedTracks.get(--shuffleIndex);
+                            trackPath = track.getPath();
+                            trackName = track.getName();
+                            recentlyTrack = new File(trackPath);
+                        } while (!recentlyTrack.exists() && shuffleIndex > 0);
 
-                try {
-                    trackChanger(trackPath, trackName);
-                } catch (IOException e) {
-                    Log.e("IOException", e.getMessage());
-                }
-            } else {
-                trackIndex = random.nextInt(tracks.size());
+                        if (trackPath.isEmpty()) {
+                            trackIndex = random.nextInt(tracks.size());
+                            Track track = tracks.get(trackIndex);
+                            trackPath = track.getPath();
+                            trackName = track.getName();
+                        }
 
-                Track track = tracks.get(trackIndex);
-                recentlyPlayedTracksTracksRepository.add(track);
-                recentlyPlayedTracks.add(0, track);
-                shuffleIndex = 0;
+                        trackChanger(trackPath, trackName);
+                    } else {
+                        trackIndex = random.nextInt(tracks.size());
 
-                try {
-                    trackChanger(track.getPath(), track.getName());
-                } catch (IOException e) {
-                    Log.e("IOException", e.getMessage());
+                        Track track = tracks.get(trackIndex);
+                        final int SIZE = recentlyPlayedTracks.size();
+
+                        while (recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
+                            trackIndex = random.nextInt(tracks.size());
+                            track = tracks.get(trackIndex);
+                        }
+
+                        recentlyPlayedTracksTracksRepository.add(track);
+                        recentlyPlayedTracks.add(0, track);
+                        shuffleIndex = 0;
+
+                        trackChanger(track.getPath(), track.getName());
+                    }
+                } else {
+                    if (trackIndex - 1 >= 0) {
+                        Track track = tracks.get(--trackIndex);
+                        trackChanger(track.getPath(), track.getName());
+                    }
                 }
             }
-        } else {
-            if (trackIndex - 1 >= 0) {
-                try {
-                    Track track = tracks.get(--trackIndex);
-                    trackChanger(track.getPath(), track.getName());
-                } catch (IOException e) {
-                    Log.e("IOException", e.getMessage());
-                }
-            }
-        }
+        }).start();
     }
 
-    private void trackChanger(String path, String track) throws IOException {
-        mediaPlayer.reset();
-        mediaPlayer.setDataSource(path);
-        mediaPlayer.prepare();
-        mediaPlayer.setLooping(isLooping);
+    private void trackChanger(final String PATH, final String TRACK) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                animationReset();
 
-        if (!isPaused) {
-            mediaPlayer.start();
+                try {
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(PATH);
+                    mediaPlayer.prepare();
+                    mediaPlayer.setLooping(isLooping);
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+
+                if (!isPaused) {
+                    mediaPlayer.start();
+                }
+
+                trackName.setText(TRACK);
+
+                final int DURATION = mediaPlayer.getDuration();
+                interval = DURATION * 1.0 / numberOfImages;
+
+                seekBar.setProgress(0);
+                seekBar.setMax(DURATION);
+
+                trackDuration.setText(timeFormat(DURATION));
+            }
+        });
+    }
+
+    private void animationReset() {
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
+        trackName.startAnimation(animation);
+    }
+
+    private String timeFormat(int duration) {
+        if (TimeUnit.MILLISECONDS.toHours(duration) > 0) {
+            return String.format("%2d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(duration),
+                    TimeUnit.MILLISECONDS.toMinutes(duration) % TimeUnit.HOURS.toMinutes(1),
+                    TimeUnit.MILLISECONDS.toSeconds(duration) % TimeUnit.MINUTES.toSeconds(1));
+        } else {
+            return String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(duration),
+                    TimeUnit.MILLISECONDS.toSeconds(duration) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)));
         }
-
-        trackName.setText(track);
-
-        int duration = mediaPlayer.getDuration();
-
-        interval = duration * 1.0 / numberOfImages;
-
-        seekBar.setProgress(0);
-        seekBar.setMax(duration);
-
-        trackDuration.setText(String.format("%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(duration),
-                TimeUnit.MILLISECONDS.toSeconds(duration) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-        ));
     }
 
     public void changeTrackEvents(View view) {
@@ -395,9 +409,13 @@ public class MusicPlayerActivity extends Activity {
                 ((ImageButton) view).setImageResource(R.drawable.random_pressed);
 
                 Track track = tracks.get(trackIndex);
-                recentlyPlayedTracksTracksRepository.add(track);
-                recentlyPlayedTracks.add(track);
-                shuffleIndex = recentlyPlayedTracks.size() - 1;
+                final int SIZE = recentlyPlayedTracks.size();
+
+                if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
+                    recentlyPlayedTracksTracksRepository.add(track);
+                    recentlyPlayedTracks.add(track);
+                    shuffleIndex = recentlyPlayedTracks.size() - 1;
+                }
             }
 
             shuffleMode = !shuffleMode;
@@ -409,10 +427,11 @@ public class MusicPlayerActivity extends Activity {
                 mediaPlayer = null;
             }
 
-            saveSettings.saveSettings(SAVE_LOOPING, isLooping);
-            saveSettings.saveSettings(SAVE_RANDOM_MODE, shuffleMode);
+            saveSettings.saveSettings(Constants.SAVE_LOOPING, isLooping);
+            saveSettings.saveSettings(Constants.SAVE_RANDOM_MODE, shuffleMode);
 
             startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
     }
 }

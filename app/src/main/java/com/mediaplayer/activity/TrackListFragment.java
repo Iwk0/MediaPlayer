@@ -18,20 +18,18 @@ import android.widget.TextView;
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
+import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
 
 public class TrackListFragment extends Fragment {
 
-    private static final String TRACKS_PATH = "tracks path";
-    private static final String TRACK_PATH = "track path";
-    private static final String TRACK_NAME = "track name";
-    private static final String RECENTLY_PLAYED = "recently played";
-
     private ArrayList<Track> recentlyPlayedTracks;
     private RecentlyPlayedTracksRepository recentlyPlayedTracksRepository;
     private ProgressBar progressBar;
+    private SaveSettings saveSettings;
     private View view;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -39,6 +37,8 @@ public class TrackListFragment extends Fragment {
 
         recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(getActivity());
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
+        saveSettings = new SaveSettings(getActivity());
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
 
@@ -52,22 +52,26 @@ public class TrackListFragment extends Fragment {
             protected void onPostExecute(final ArrayList<Track> tracks) {
                 super.onPostExecute(tracks);
 
-                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(getActivity(), R.layout.track_list, tracks);
-                ListView listView = (ListView) view.findViewById(R.id.songListView);
+                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(getActivity(), R.layout.track_list_item, tracks);
+                ListView listView = (ListView) view.findViewById(R.id.trackListView);
                 listView.setAdapter(loadSongAdapter);
+                listView.setSelection(saveSettings.loadSettings(Constants.REDIRECT_IN_LIST_VIEW, -1));
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        TextView textViewItem = (TextView) view.findViewById(R.id.songName);
+                        TextView textViewItem = (TextView) view.findViewById(R.id.trackName);
 
                         Intent intent = new Intent(getActivity(), MusicPlayerActivity.class);
-                        intent.putExtra(TRACK_NAME, (String) textViewItem.getText());
-                        intent.putExtra(TRACK_PATH, (String) textViewItem.getTag());
-                        intent.putParcelableArrayListExtra(RECENTLY_PLAYED, recentlyPlayedTracks);
-                        intent.putParcelableArrayListExtra(TRACKS_PATH, tracks);
+                        intent.putExtra(Constants.TRACK_NAME, (String) textViewItem.getText());
+                        intent.putExtra(Constants.TRACK_PATH, (String) textViewItem.getTag());
+                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
+                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, tracks);
+
+                        saveSettings.saveSettings(Constants.REDIRECT_IN_LIST_VIEW, i);
 
                         startActivity(intent);
+                        getActivity().finish();
                     }
                 });
 

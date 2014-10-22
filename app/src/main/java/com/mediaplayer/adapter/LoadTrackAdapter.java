@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.Constants;
+import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +27,15 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
 
     private List<Track> trackNames;
     private LayoutInflater inflater;
+    private SaveSettings saveSettings;
+    private int lastClickedView;
 
     public LoadTrackAdapter(Context context, int songViewId, ArrayList<Track> trackNames) {
         super(context, songViewId);
         this.trackNames = trackNames;
+        this.saveSettings = new SaveSettings(context);
+
+        this.lastClickedView = saveSettings.loadSettings(Constants.REDIRECT_IN_LIST_VIEW, -1);
 
         inflater = ((Activity) context).getLayoutInflater();
     }
@@ -50,21 +57,27 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder songViewHolder;
+        ViewHolder trackViewHolder;
 
         if (view == null) {
-            view = inflater.inflate(R.layout.track_list, viewGroup, false);
+            view = inflater.inflate(R.layout.track_list_item, viewGroup, false);
 
-            songViewHolder = new ViewHolder();
-            songViewHolder.trackName = (TextView) view.findViewById(R.id.songName);
+            trackViewHolder = new ViewHolder();
+            trackViewHolder.trackName = (TextView) view.findViewById(R.id.trackName);
 
-            view.setTag(songViewHolder);
+            view.setTag(trackViewHolder);
         } else {
-            songViewHolder = (ViewHolder) view.getTag();
+            trackViewHolder = (ViewHolder) view.getTag();
         }
 
-        songViewHolder.trackName.setText(trackNames.get(i).getName());
-        songViewHolder.trackName.setTag(trackNames.get(i).getPath());
+        trackViewHolder.trackName.setText(trackNames.get(i).getName());
+        trackViewHolder.trackName.setTag(trackNames.get(i).getPath());
+
+        if (lastClickedView == i) {
+            view.setBackground(getContext().getResources().getDrawable(R.drawable.controls_background));
+        } else {
+            view.setBackground(null);
+        }
 
         return view;
     }

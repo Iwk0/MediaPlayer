@@ -18,16 +18,11 @@ import java.util.List;
  */
 public class XmlParser {
 
-    private final static String ID = "id";
-    private final static String PATH = "path";
-    private final static String IMAGE = "image";
-    private final static String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
-
     public static Image xmlParserImage(int imagesId) throws XmlPullParserException, IOException {
         XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
         XmlPullParser parser = xmlFactoryObject.newPullParser();
 
-        parser.setInput(new FileInputStream(STORAGE_PATH + "/program/" + "images.xml"), null);
+        parser.setInput(new FileInputStream(Constants.STORAGE_PATH + "/program/" + "images.xml"), null);
 
         Image image = null;
         String curText = null;
@@ -39,7 +34,7 @@ public class XmlParser {
 
             switch (event) {
                 case XmlPullParser.START_TAG:
-                    if (tagName.equalsIgnoreCase(IMAGE)) {
+                    if (tagName.equalsIgnoreCase(Constants.IMAGE)) {
                         if (image != null && image.getId() == imagesId) {
                             image.setPaths(paths);
                             return image;
@@ -52,9 +47,9 @@ public class XmlParser {
                     curText = parser.getText();
                     break;
                 case XmlPullParser.END_TAG:
-                    if (tagName.equalsIgnoreCase(ID)) {
+                    if (tagName.equalsIgnoreCase(Constants.ID)) {
                         image.setId(Integer.parseInt(curText));
-                    } else if (tagName.equalsIgnoreCase(PATH)) {
+                    } else if (tagName.equalsIgnoreCase(Constants.PATH)) {
                         paths.add(curText);
                     }
                     break;

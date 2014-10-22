@@ -11,6 +11,9 @@ public class Track implements Parcelable {
     private String name;
     private String path;
 
+    public Track() {
+    }
+
     public Track(Parcel in){
         this.name = in.readString();
         this.path = in.readString();

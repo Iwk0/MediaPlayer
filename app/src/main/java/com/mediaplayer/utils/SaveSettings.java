@@ -9,13 +9,11 @@ import android.content.SharedPreferences;
  */
 public class SaveSettings {
 
-    private static final String PREF_SETTINGS = "preference settings";
-
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
 
     public SaveSettings(Context context) {
-        this.sp = context.getSharedPreferences(PREF_SETTINGS, Activity.MODE_PRIVATE);
+        this.sp = context.getSharedPreferences(Constants.PREF_SETTINGS, Activity.MODE_PRIVATE);
         this.editor = sp.edit();
     }
 
@@ -26,5 +24,14 @@ public class SaveSettings {
 
     public boolean loadSettings(String key, boolean defaultValue) {
         return sp.getBoolean(key, defaultValue);
+    }
+
+    public void saveSettings(String key, int value) {
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public int loadSettings(String key, int defaultValue) {
+        return sp.getInt(key, defaultValue);
     }
 }

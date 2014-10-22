@@ -7,8 +7,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/songName"
-        android:gravity="center"
-        android:background="@drawable/clicked_background" />
+        android:id="@+id/trackName"
+        android:gravity="center" />
 
 </RelativeLayout>
