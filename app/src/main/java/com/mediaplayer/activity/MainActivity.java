@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        ActionBar.Tab musicTab = actionBar.newTab().setText("Music");
+        ActionBar.Tab musicTab = actionBar.newTab().setText("ALL");
         ActionBar.Tab playListTab = actionBar.newTab().setText("Play List");
 
         musicTab.setTabListener(new TabListener(music));

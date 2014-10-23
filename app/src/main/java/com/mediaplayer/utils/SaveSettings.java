@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+import com.mediaplayer.model.Track;
+
 /**
  * Created by imishev on 16.10.2014 г..
  */
@@ -26,12 +29,15 @@ public class SaveSettings {
         return sp.getBoolean(key, defaultValue);
     }
 
-    public void saveSettings(String key, int value) {
-        editor.putInt(key, value);
+    public void saveSettings(String key, Track track) {
+        Gson gson = new Gson();
+        editor.putString(key, gson.toJson(track));
         editor.commit();
     }
 
-    public int loadSettings(String key, int defaultValue) {
-        return sp.getInt(key, defaultValue);
+    public Track loadSettings(String key) {
+        Gson gson = new Gson();
+        String json = sp.getString(key, null);
+        return gson.fromJson(json, Track.class);
     }
 }

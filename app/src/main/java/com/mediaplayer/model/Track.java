@@ -8,20 +8,45 @@ import android.os.Parcelable;
  */
 public class Track implements Parcelable {
 
+    private int id;
+    private int duration;
     private String name;
     private String path;
+    private String album;
 
     public Track() {
     }
 
-    public Track(Parcel in){
+    public Track(Parcel in) {
+        this.id = in.readInt();
+        this.duration = in.readInt();
         this.name = in.readString();
         this.path = in.readString();
+        this.album = in.readString();
     }
 
-    public Track(String name, String path) {
-        this.name = name;
-        this.path = path;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
     }
 
     public String getName() {
@@ -47,8 +72,11 @@ public class Track implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeInt(duration);
         parcel.writeString(name);
         parcel.writeString(path);
+        parcel.writeString(album);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -61,4 +89,24 @@ public class Track implements Parcelable {
             return new Track[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Track)) return false;
+
+        Track track = (Track) o;
+
+        if (id != track.id) return false;
+        if (name != null ? !name.equals(track.name) : track.name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
 }
