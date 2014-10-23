@@ -69,7 +69,7 @@ public class TrackListFragment extends Fragment {
                         intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, TRACKS);
 
                         startActivity(intent);
-                        getActivity().finish();
+                        activity.finish();
                     }
                 });
 
