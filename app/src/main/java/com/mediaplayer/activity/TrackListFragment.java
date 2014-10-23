@@ -1,5 +1,6 @@
 package com.mediaplayer.activity;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
@@ -28,17 +28,20 @@ public class TrackListFragment extends Fragment {
 
     private ArrayList<Track> recentlyPlayedTracks;
     private RecentlyPlayedTracksRepository recentlyPlayedTracksRepository;
+    private Activity activity;
     private ProgressBar progressBar;
-    private SaveSettings saveSettings;
+    private Track track;
     private View view;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.activity_track_list, container, false);
 
-        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(getActivity());
+        activity = getActivity();
+        SaveSettings saveSettings = new SaveSettings(activity);
+        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(activity);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        saveSettings = new SaveSettings(getActivity());
+        track = saveSettings.loadSettings(Constants.TRACK);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
 
@@ -49,26 +52,21 @@ public class TrackListFragment extends Fragment {
             }
 
             @Override
-            protected void onPostExecute(final ArrayList<Track> tracks) {
-                super.onPostExecute(tracks);
+            protected void onPostExecute(final ArrayList<Track> TRACKS) {
+                super.onPostExecute(TRACKS);
 
-                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(getActivity(), R.layout.track_list_item, tracks);
+                ArrayAdapter loadSongAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
                 ListView listView = (ListView) view.findViewById(R.id.trackListView);
                 listView.setAdapter(loadSongAdapter);
-                listView.setSelection(saveSettings.loadSettings(Constants.REDIRECT_IN_LIST_VIEW, -1));
+                listView.setSelection(track == null ? -1 : track.getId());
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        TextView textViewItem = (TextView) view.findViewById(R.id.trackName);
-
                         Intent intent = new Intent(getActivity(), MusicPlayerActivity.class);
-                        intent.putExtra(Constants.TRACK_NAME, (String) textViewItem.getText());
-                        intent.putExtra(Constants.TRACK_PATH, (String) textViewItem.getTag());
+                        intent.putExtra(Constants.TRACK, (Track) view.findViewById(R.id.trackName).getTag());
                         intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
-                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, tracks);
-
-                        saveSettings.saveSettings(Constants.REDIRECT_IN_LIST_VIEW, i);
+                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, TRACKS);
 
                         startActivity(intent);
                         getActivity().finish();
@@ -84,16 +82,30 @@ public class TrackListFragment extends Fragment {
 
                 ArrayList<Track> tracks = new ArrayList<Track>();
 
-                String[] type = {
+                final String[] TYPE = {
                         MediaStore.Audio.Media._ID,
                         MediaStore.Audio.Media.DATA,
-                        MediaStore.Audio.Media.DISPLAY_NAME };
+                        MediaStore.Audio.Media.DISPLAY_NAME,
+                        MediaStore.Audio.Media.ALBUM,
+                        MediaStore.Audio.Media.DURATION };
 
-                Cursor files = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, type, null, null, null);
+                Cursor files = activity.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, TYPE, null, null, null);
 
+                int id = 0;
                 while(files.moveToNext()) {
-                    String trackName = files.getString(2);
-                    tracks.add(new Track(trackName.substring(0, trackName.length() - 4), files.getString(1)));
+                    int duration = files.getInt(4);
+
+                    if (duration >= 30000) {
+                        String trackName = files.getString(2);
+
+                        Track track = new Track();
+                        track.setId(id++);
+                        track.setName(trackName.substring(0, trackName.length() - 4));
+                        track.setPath(files.getString(1));
+                        track.setAlbum(files.getString(3));
+                        track.setDuration(duration);
+                        tracks.add(track);
+                    }
                 }
 
                 return tracks;

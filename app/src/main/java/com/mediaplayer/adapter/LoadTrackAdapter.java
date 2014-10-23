@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.model.Track;
-import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
@@ -25,29 +24,26 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
         TextView trackName;
     }
 
-    private List<Track> trackNames;
+    private List<Track> tracks;
+    private Track track;
     private LayoutInflater inflater;
-    private SaveSettings saveSettings;
-    private int lastClickedView;
 
-    public LoadTrackAdapter(Context context, int songViewId, ArrayList<Track> trackNames) {
-        super(context, songViewId);
-        this.trackNames = trackNames;
-        this.saveSettings = new SaveSettings(context);
-
-        this.lastClickedView = saveSettings.loadSettings(Constants.REDIRECT_IN_LIST_VIEW, -1);
+    public LoadTrackAdapter(Context context, int trackViewId, ArrayList<Track> tracks, Track track) {
+        super(context, trackViewId);
+        this.tracks = tracks;
+        this.track = track;
 
         inflater = ((Activity) context).getLayoutInflater();
     }
 
     @Override
     public int getCount() {
-        return trackNames.size();
+        return tracks.size();
     }
 
     @Override
     public Track getItem(int i) {
-        return trackNames.get(i);
+        return tracks.get(i);
     }
 
     @Override
@@ -70,14 +66,16 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
             trackViewHolder = (ViewHolder) view.getTag();
         }
 
-        trackViewHolder.trackName.setText(trackNames.get(i).getName());
-        trackViewHolder.trackName.setTag(trackNames.get(i).getPath());
+        Track track = tracks.get(i);
 
-        if (lastClickedView == i) {
-            view.setBackground(getContext().getResources().getDrawable(R.drawable.controls_background));
+        if (track.equals(this.track)) {
+            trackViewHolder.trackName.setBackground(getContext().getResources().getDrawable(R.drawable.pressed_track_list));
         } else {
-            view.setBackground(null);
+            trackViewHolder.trackName.setBackground(null);
         }
+
+        trackViewHolder.trackName.setText(track.getName());
+        trackViewHolder.trackName.setTag(track);
 
         return view;
     }
