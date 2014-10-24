@@ -5,4 +5,5 @@
     <string name="current_time">00:00</string>
     <string name="track">Track:</string>
     <string name="duration">Duration:</string>
+    <string name="quick">Quick playlist</string>
 </resources>

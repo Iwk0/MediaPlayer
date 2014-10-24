@@ -63,7 +63,7 @@ public class TrackListFragment extends Fragment {
 
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Intent intent = new Intent(getActivity(), MusicPlayerActivity.class);
+                        Intent intent = new Intent(activity, MusicPlayerActivity.class);
                         intent.putExtra(Constants.TRACK, (Track) view.findViewById(R.id.trackName).getTag());
                         intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
                         intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, TRACKS);
