@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,13 +36,13 @@ public class TrackListFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.activity_track_list, container, false);
-
         activity = getActivity();
+
         SaveSettings saveSettings = new SaveSettings(activity);
         recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(activity);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        track = saveSettings.loadSettings(Constants.TRACK);
+        track = saveSettings.load(Constants.TRACK);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
 
@@ -87,7 +88,8 @@ public class TrackListFragment extends Fragment {
                         MediaStore.Audio.Media.DATA,
                         MediaStore.Audio.Media.DISPLAY_NAME,
                         MediaStore.Audio.Media.ALBUM,
-                        MediaStore.Audio.Media.DURATION };
+                        MediaStore.Audio.Media.DURATION
+                };
 
                 Cursor files = activity.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, TYPE, null, null, null);
 

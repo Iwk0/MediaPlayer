@@ -25,6 +25,7 @@ import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.ImageResize;
 import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 import com.mediaplayer.utils.SaveSettings;
+import com.mediaplayer.utils.TimeFormatter;
 import com.mediaplayer.utils.XmlParser;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -33,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class MusicPlayerActivity extends Activity {
 
@@ -64,8 +64,8 @@ public class MusicPlayerActivity extends Activity {
         recentlyPlayedTracksTracksRepository = new RecentlyPlayedTracksRepository(this);
         saveSettings = new SaveSettings(this);
 
-        shuffleMode = saveSettings.loadSettings(Constants.SAVE_RANDOM_MODE, false);
-        isLooping = saveSettings.loadSettings(Constants.SAVE_LOOPING, true);
+        shuffleMode = saveSettings.load(Constants.SAVE_RANDOM_MODE, false);
+        isLooping = saveSettings.load(Constants.SAVE_LOOPING, true);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -125,6 +125,7 @@ public class MusicPlayerActivity extends Activity {
                 shuffleIndex = recentlyPlayedTracks.size() - 1;
             }
 
+
             handler = new Handler();
             runnable = new Runnable() {
 
@@ -167,7 +168,7 @@ public class MusicPlayerActivity extends Activity {
 
             final int DURATION = mediaPlayer.getDuration();
             interval = DURATION * 1.0 / numberOfImages;
-            trackDurationView.setText(timeFormat(DURATION));
+            trackDurationView.setText(TimeFormatter.format(DURATION));
 
             seekBar.setMax(DURATION);
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -178,7 +179,7 @@ public class MusicPlayerActivity extends Activity {
                         mediaPlayer.seekTo(i);
                     }
 
-                    currentTimeView.setText(timeFormat(i));
+                    currentTimeView.setText(TimeFormatter.format(i));
                 }
 
                 @Override
@@ -204,9 +205,9 @@ public class MusicPlayerActivity extends Activity {
         super.onBackPressed();
         handler.removeCallbacks(runnable);
 
-        saveSettings.saveSettings(Constants.SAVE_LOOPING, isLooping);
-        saveSettings.saveSettings(Constants.SAVE_RANDOM_MODE, shuffleMode);
-        saveSettings.saveSettings(Constants.TRACK, (Track) trackNameView.getTag());
+        saveSettings.save(Constants.SAVE_LOOPING, isLooping);
+        saveSettings.save(Constants.SAVE_RANDOM_MODE, shuffleMode);
+        saveSettings.save(Constants.TRACK, (Track) trackNameView.getTag());
 
         if (mediaPlayer != null) {
             mediaPlayer.release();
@@ -279,9 +280,9 @@ public class MusicPlayerActivity extends Activity {
                 mediaPlayer = null;
             }
 
-            saveSettings.saveSettings(Constants.SAVE_LOOPING, isLooping);
-            saveSettings.saveSettings(Constants.SAVE_RANDOM_MODE, shuffleMode);
-            saveSettings.saveSettings(Constants.TRACK, (Track) trackNameView.getTag());
+            saveSettings.save(Constants.SAVE_LOOPING, isLooping);
+            saveSettings.save(Constants.SAVE_RANDOM_MODE, shuffleMode);
+            saveSettings.save(Constants.TRACK, (Track) trackNameView.getTag());
 
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -404,7 +405,7 @@ public class MusicPlayerActivity extends Activity {
                 seekBar.setProgress(0);
                 seekBar.setMax(DURATION);
 
-                trackDurationView.setText(timeFormat(DURATION));
+                trackDurationView.setText(TimeFormatter.format(DURATION));
             }
         });
     }
@@ -412,18 +413,5 @@ public class MusicPlayerActivity extends Activity {
     private void animationReset() {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.move);
         trackNameView.startAnimation(animation);
-    }
-
-    private String timeFormat(int duration) {
-        if (TimeUnit.MILLISECONDS.toHours(duration) > 0) {
-            return String.format("%2d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(duration),
-                    TimeUnit.MILLISECONDS.toMinutes(duration) % TimeUnit.HOURS.toMinutes(1),
-                    TimeUnit.MILLISECONDS.toSeconds(duration) % TimeUnit.MINUTES.toSeconds(1));
-        } else {
-            return String.format("%02d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(duration),
-                    TimeUnit.MILLISECONDS.toSeconds(duration) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)));
-        }
     }
 }

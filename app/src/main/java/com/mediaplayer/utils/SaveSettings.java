@@ -20,22 +20,22 @@ public class SaveSettings {
         this.editor = sp.edit();
     }
 
-    public void saveSettings(String key, boolean value) {
+    public void save(String key, boolean value) {
         editor.putBoolean(key, value);
         editor.commit();
     }
 
-    public boolean loadSettings(String key, boolean defaultValue) {
+    public boolean load(String key, boolean defaultValue) {
         return sp.getBoolean(key, defaultValue);
     }
 
-    public void saveSettings(String key, Track track) {
+    public void save(String key, Track track) {
         Gson gson = new Gson();
         editor.putString(key, gson.toJson(track));
         editor.commit();
     }
 
-    public Track loadSettings(String key) {
+    public Track load(String key) {
         Gson gson = new Gson();
         String json = sp.getString(key, null);
         return gson.fromJson(json, Track.class);

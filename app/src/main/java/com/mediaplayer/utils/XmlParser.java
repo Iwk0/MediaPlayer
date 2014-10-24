@@ -22,7 +22,7 @@ public class XmlParser {
         XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
         XmlPullParser parser = xmlFactoryObject.newPullParser();
 
-        parser.setInput(new FileInputStream(Constants.STORAGE_PATH + "/program/" + "images.xml"), null);
+        parser.setInput(new FileInputStream(Constants.STORAGE_PATH + "/program/images.xml"), null);
 
         Image image = null;
         String curText = null;
@@ -48,7 +48,7 @@ public class XmlParser {
                     break;
                 case XmlPullParser.END_TAG:
                     if (tagName.equalsIgnoreCase(Constants.ID)) {
-                        image.setId(Integer.parseInt(curText));
+                        image.setId(Integer.valueOf(curText));
                     } else if (tagName.equalsIgnoreCase(Constants.PATH)) {
                         paths.add(curText);
                     }

@@ -3,6 +3,7 @@ package com.mediaplayer.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.media.AudioManager;
 import android.os.Bundle;
 
 import com.mediaplayer.R;
@@ -14,6 +15,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
+
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         Fragment music = new TrackListFragment();
         Fragment playList = new PlayListFragment();
