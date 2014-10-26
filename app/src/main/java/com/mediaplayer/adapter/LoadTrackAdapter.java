@@ -1,6 +1,5 @@
 package com.mediaplayer.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.TextView;
 
 import com.mediaplayer.R;
 import com.mediaplayer.model.Track;
-import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +24,13 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
 
     private List<Track> tracks;
     private Track track;
-    private LayoutInflater inflater;
+    private Context context;
 
     public LoadTrackAdapter(Context context, int trackViewId, ArrayList<Track> tracks, Track track) {
         super(context, trackViewId);
         this.tracks = tracks;
         this.track = track;
-
-        inflater = ((Activity) context).getLayoutInflater();
+        this.context = context;
     }
 
     @Override
@@ -56,6 +53,8 @@ public class LoadTrackAdapter extends ArrayAdapter<Track> {
         ViewHolder trackViewHolder;
 
         if (view == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.track_list_item, viewGroup, false);
 
             trackViewHolder = new ViewHolder();
