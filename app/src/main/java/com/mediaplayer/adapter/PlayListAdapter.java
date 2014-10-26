@@ -14,17 +14,14 @@ import com.mediaplayer.model.Track;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Ivo Mishev on 25/10/2014.
- */
 public class PlayListAdapter extends ArrayAdapter<Track>  {
 
+    private static List<Track> checkedTracks;
     private static class ViewHolder {
         CheckBox checkBox;
     }
 
     private List<Track> tracks;
-    private List<Track> checkedTracks;
     private Context context;
 
     public PlayListAdapter(Context context, int trackViewId, ArrayList<Track> tracks) {
@@ -52,7 +49,7 @@ public class PlayListAdapter extends ArrayAdapter<Track>  {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        final ViewHolder trackViewHolder;
+        ViewHolder trackViewHolder;
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(
@@ -61,14 +58,15 @@ public class PlayListAdapter extends ArrayAdapter<Track>  {
 
             trackViewHolder = new ViewHolder();
             trackViewHolder.checkBox = (CheckBox) view.findViewById(R.id.checkBox);
-            trackViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            trackViewHolder.checkBox.setOnCheckedChangeListener(
+                    new CompoundButton.OnCheckedChangeListener() {
 
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    Track track = (Track) trackViewHolder.checkBox.getTag();
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    Track track = (Track) compoundButton.getTag();
                     track.setSelected(compoundButton.isChecked());
 
-                    if (b) {
+                    if (isChecked) {
                         checkedTracks.add(track);
                     } else {
                         checkedTracks.remove(track);
@@ -76,15 +74,14 @@ public class PlayListAdapter extends ArrayAdapter<Track>  {
                 }
             });
 
-            trackViewHolder.checkBox.setTag(tracks.get(i));
             view.setTag(trackViewHolder);
         } else {
             trackViewHolder = (ViewHolder) view.getTag();
-            ((ViewHolder) view.getTag()).checkBox.setTag(tracks.get(i));
         }
 
-        Track track = (Track) trackViewHolder.checkBox.getTag();
+        Track track = tracks.get(i);
         trackViewHolder.checkBox.setText(track.getName());
+        trackViewHolder.checkBox.setTag(tracks.get(i));
         trackViewHolder.checkBox.setChecked(track.isSelected());
 
         return view;

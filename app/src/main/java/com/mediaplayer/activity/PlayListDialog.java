@@ -47,8 +47,6 @@ public class PlayListDialog extends Activity {
 
                     @Override
                     public void onClick(View view) {
-                        int a = playListAdapter.getCheckedTracks().size();
-                        int t = 4343;
                     }
                 });
 
