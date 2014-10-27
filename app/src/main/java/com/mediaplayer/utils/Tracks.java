@@ -43,6 +43,7 @@ public class Tracks {
             }
         }
 
+        files.close();
         return tracks;
     }
 }

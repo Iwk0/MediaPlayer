@@ -15,9 +15,9 @@ import android.widget.ProgressBar;
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.Database;
 import com.mediaplayer.utils.Tracks;
 import com.mediaplayer.utils.Constants;
-import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class TrackListFragment extends Fragment {
 
     private ArrayList<Track> recentlyPlayedTracks;
-    private RecentlyPlayedTracksRepository recentlyPlayedTracksRepository;
+    private Database database;
     private Track track;
 
     private Activity activity;
@@ -37,7 +37,7 @@ public class TrackListFragment extends Fragment {
         activity = getActivity();
 
         SaveSettings saveSettings = new SaveSettings(activity);
-        recentlyPlayedTracksRepository = new RecentlyPlayedTracksRepository(activity);
+        database = new Database(activity);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         track = saveSettings.load(Constants.TRACK);
@@ -76,7 +76,7 @@ public class TrackListFragment extends Fragment {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
-                recentlyPlayedTracks = recentlyPlayedTracksRepository.getAllTracks();
+                recentlyPlayedTracks = database.getAllTracks(Constants.RECENTLY_PLAYED_TABLE_NAME);
                 return Tracks.getAllTracks(activity);
             }
         }.execute();

@@ -7,7 +7,7 @@ import android.os.Environment;
  */
 public interface Constants {
 
-    int DATABASE_VERSION = 40;
+    int DATABASE_VERSION = 41;
     String TRACKS_PATH = "all tracks";
     String TRACK = "track";
     String SAVE_LOOPING = "looping";
@@ -15,7 +15,9 @@ public interface Constants {
     String RECENTLY_PLAYED = "recently played";
     String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     String DATABASE_NAME = "recentlyPlayedTracks";
-    String TABLE_NAME = "paths";
+    String DATABASE = "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT, %s INTEGER);";
+    String RECENTLY_PLAYED_TABLE_NAME = "paths";
+    String QUICK_LIST_TABLE_NAME = "quickList";
     String COLUMN_ID = "id";
     String COLUMN_PATH = "path";
     String COLUMN_NAME = "name";
@@ -26,4 +28,5 @@ public interface Constants {
     String ID = "id";
     String PATH = "path";
     String IMAGE = "image";
+    String QUICK_PLAY_LIST_DATA = "quick list";
 }

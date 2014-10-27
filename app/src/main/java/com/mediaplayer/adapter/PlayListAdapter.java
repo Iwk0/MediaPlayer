@@ -16,7 +16,7 @@ import java.util.List;
 
 public class PlayListAdapter extends ArrayAdapter<Track>  {
 
-    private static List<Track> checkedTracks;
+    private static ArrayList<Track> checkedTracks;
     private static class ViewHolder {
         CheckBox checkBox;
     }
@@ -87,7 +87,7 @@ public class PlayListAdapter extends ArrayAdapter<Track>  {
         return view;
     }
 
-    public List<Track> getCheckedTracks() {
+    public ArrayList<Track> getCheckedTracks() {
         return checkedTracks;
     }
 }

@@ -22,8 +22,8 @@ import com.mediaplayer.R;
 import com.mediaplayer.model.Image;
 import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.Constants;
+import com.mediaplayer.utils.Database;
 import com.mediaplayer.utils.ImageResize;
-import com.mediaplayer.utils.RecentlyPlayedTracksRepository;
 import com.mediaplayer.utils.SaveSettings;
 import com.mediaplayer.utils.TimeFormatter;
 import com.mediaplayer.utils.XmlParser;
@@ -44,7 +44,7 @@ public class MusicPlayerActivity extends Activity {
     private Runnable runnable;
     private Handler handler;
     private SaveSettings saveSettings;
-    private RecentlyPlayedTracksRepository recentlyPlayedTracksTracksRepository;
+    private Database recentlyPlayedTracksTracksRepository;
 
     //Views
     private SeekBar seekBar;
@@ -61,7 +61,7 @@ public class MusicPlayerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
 
-        recentlyPlayedTracksTracksRepository = new RecentlyPlayedTracksRepository(this);
+        recentlyPlayedTracksTracksRepository = new Database(this);
         saveSettings = new SaveSettings(this);
 
         shuffleMode = saveSettings.load(Constants.SAVE_RANDOM_MODE, false);
@@ -118,7 +118,7 @@ public class MusicPlayerActivity extends Activity {
 
                 final int SIZE = recentlyPlayedTracks.size();
                 if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(trackName)) {
-                    recentlyPlayedTracksTracksRepository.add(track);
+                    recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
                     recentlyPlayedTracks.add(track);
                 }
 
@@ -265,7 +265,7 @@ public class MusicPlayerActivity extends Activity {
                 final int SIZE = recentlyPlayedTracks.size();
 
                 if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
-                    recentlyPlayedTracksTracksRepository.add(track);
+                    recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
                     recentlyPlayedTracks.add(track);
                     shuffleIndex = recentlyPlayedTracks.size() - 1;
                 }
@@ -311,7 +311,7 @@ public class MusicPlayerActivity extends Activity {
                             track = tracks.get(trackIndex);
                         }
 
-                        recentlyPlayedTracksTracksRepository.add(track);
+                        recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
                         recentlyPlayedTracks.add(track);
 
                         shuffleIndex = recentlyPlayedTracks.size() - 1;
@@ -362,7 +362,7 @@ public class MusicPlayerActivity extends Activity {
                             track = tracks.get(trackIndex);
                         }
 
-                        recentlyPlayedTracksTracksRepository.add(track);
+                        recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
                         recentlyPlayedTracks.add(0, track);
                         shuffleIndex = 0;
 

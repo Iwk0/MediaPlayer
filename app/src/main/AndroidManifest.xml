@@ -20,16 +20,19 @@
         </activity>
         <activity
             android:name=".activity.MusicPlayerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar">
         </activity>
         <activity
             android:name=".activity.TrackInfoActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar">
         </activity>
         <activity
             android:name=".activity.PlayListDialog"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="@string/title_activity_play_list_dialog" >
+            android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+        <activity
+            android:name=".activity.QuickPlayListActivity"
+            android:theme="@android:style/Theme.Dialog">
         </activity>
     </application>
 

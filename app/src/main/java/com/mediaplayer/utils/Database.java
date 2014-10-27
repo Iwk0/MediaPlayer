@@ -13,32 +13,44 @@ import java.util.ArrayList;
 /**
  * Created by imishev on 26.9.2014 г..
  */
-public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper {
 
-    public RecentlyPlayedTracksRepository(Context context) {
+    public Database(Context context) {
         super(context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        String createTable = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT, %s INTEGER);",
-                Constants.TABLE_NAME,
+        String createTableRecentlyPlayed = String.format(Constants.DATABASE,
+                Constants.RECENTLY_PLAYED_TABLE_NAME,
                 Constants.COLUMN_ID,
                 Constants.COLUMN_POSITION,
                 Constants.COLUMN_NAME,
                 Constants.COLUMN_PATH,
                 Constants.COLUMN_ALBUM,
                 Constants.COLUMN_DURATION);
-        database.execSQL(createTable);
+
+        String createTableQuickPlayList = String.format(Constants.DATABASE,
+                Constants.QUICK_LIST_TABLE_NAME,
+                Constants.COLUMN_ID,
+                Constants.COLUMN_POSITION,
+                Constants.COLUMN_NAME,
+                Constants.COLUMN_PATH,
+                Constants.COLUMN_ALBUM,
+                Constants.COLUMN_DURATION);
+
+        database.execSQL(createTableRecentlyPlayed);
+        database.execSQL(createTableQuickPlayList);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
+        database.execSQL("DROP TABLE IF EXISTS " + Constants.RECENTLY_PLAYED_TABLE_NAME);
+        database.execSQL("DROP TABLE IF EXISTS " + Constants.QUICK_LIST_TABLE_NAME);
         onCreate(database);
     }
 
-    public void add(Track track) {
+    public void add(Track track, String table) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -48,14 +60,14 @@ public class RecentlyPlayedTracksRepository extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_ALBUM, track.getAlbum());
         values.put(Constants.COLUMN_DURATION, track.getDuration());
 
-        db.insert(Constants.TABLE_NAME, null, values);
+        db.insert(table, null, values);
         db.close();
     }
 
-    public ArrayList<Track> getAllTracks() {
+    public ArrayList<Track> getAllTracks(String table) {
         ArrayList<Track> trackArrayList = new ArrayList<Track>();
 
-        String selectQuery = String.format("SELECT * FROM %s", Constants.TABLE_NAME);
+        String selectQuery = String.format("SELECT * FROM %s", table);
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
