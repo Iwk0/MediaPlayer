@@ -15,7 +15,6 @@ import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.Database;
 import com.mediaplayer.utils.SaveSettings;
-import com.mediaplayer.utils.Tracks;
 
 import java.util.ArrayList;
 
@@ -93,6 +92,16 @@ public class PlayListDialog extends Activity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 final ArrayList<Track> tracks = data.getParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA);
+
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        for (Track track : tracks) {
+                            database.add(track, Constants.QUICK_LIST_TABLE_NAME);
+                        }
+                    }
+                }).start();
 
                 ListView listView = (ListView) findViewById(R.id.trackListView);
                 listView.setAdapter(new LoadTrackAdapter(activity, R.layout.track_list_item, tracks, track));
