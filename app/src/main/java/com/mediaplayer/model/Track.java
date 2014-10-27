@@ -3,6 +3,8 @@ package com.mediaplayer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Comparator;
+
 /**
  * Created by imishev on 10.10.2014 г..
  */
@@ -13,6 +15,7 @@ public class Track implements Parcelable {
     private String name;
     private String path;
     private String album;
+    private boolean isSelected;
 
     public Track() {
     }
@@ -63,6 +66,14 @@ public class Track implements Parcelable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean isSelected) {
+        this.isSelected = isSelected;
     }
 
     @Override

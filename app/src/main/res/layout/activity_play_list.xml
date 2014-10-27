@@ -5,7 +5,8 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/quickMenu"
+        android:id="@+id/quickPlayList"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -28,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_below="@+id/quickMenu">
+        android:layout_below="@+id/quickPlayList">
 
         <ImageView
             android:layout_width="wrap_content"

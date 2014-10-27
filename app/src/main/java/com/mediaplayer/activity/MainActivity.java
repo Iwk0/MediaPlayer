@@ -3,8 +3,10 @@ package com.mediaplayer.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.view.View;
 
 import com.mediaplayer.R;
 import com.mediaplayer.utils.TabListener;
