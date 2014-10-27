@@ -1,7 +1,5 @@
 package com.mediaplayer.utils;
 
-import android.os.Environment;
-
 import com.mediaplayer.model.Image;
 
 import org.xmlpull.v1.XmlPullParser;
