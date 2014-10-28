@@ -20,11 +20,13 @@ import java.util.ArrayList;
 
 public class PlayListDialog extends Activity {
 
-    private ArrayList<Track> recentlyPlayedTracks;
-    private Activity activity;
-    private ProgressBar progressBar;
+    private ArrayList<Track> recentlyPlayed;
+
     private Database database;
     private Track track;
+
+    private Activity activity;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,8 @@ public class PlayListDialog extends Activity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Intent intent = new Intent(activity, MusicPlayerActivity.class);
                         intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
-                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
-                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, TRACKS);
+                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+                        intent.putParcelableArrayListExtra(Constants.TRACKS, TRACKS);
 
                         startActivity(intent);
                         activity.finish();
@@ -72,7 +74,7 @@ public class PlayListDialog extends Activity {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
-                return recentlyPlayedTracks = database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
+                return recentlyPlayed = database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
             }
         }.execute();
 
@@ -83,6 +85,19 @@ public class PlayListDialog extends Activity {
                 startActivityForResult(new Intent(activity, QuickPlayListActivity.class), 1);
             }
         });
+
+        findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PlayListDialog.this, MusicPlayerActivity.class);
+                intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+                intent.putParcelableArrayListExtra(Constants.TRACKS, database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME));
+
+                startActivity(intent);
+                activity.finish();
+            }
+        });
     }
 
     @Override
@@ -91,34 +106,47 @@ public class PlayListDialog extends Activity {
 
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                final ArrayList<Track> tracks = data.getParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA);
-
-                new Thread(new Runnable() {
+                new AsyncTask<Void, Void, ArrayList<Track>>() {
 
                     @Override
-                    public void run() {
+                    protected ArrayList<Track> doInBackground(Void... voids) {
+                        ArrayList<Track> tracks = data.getParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA);
+
                         for (Track track : tracks) {
                             database.add(track, Constants.QUICK_LIST_TABLE_NAME);
                         }
-                    }
-                }).start();
 
-                ListView listView = (ListView) findViewById(R.id.trackListView);
-                listView.setAdapter(new LoadTrackAdapter(activity, R.layout.track_list_item, tracks, track));
-                listView.setSelection(track == null ? -1 : track.getId());
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        return database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
+                    }
 
                     @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Intent intent = new Intent(activity, MusicPlayerActivity.class);
-                        intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
-                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
-                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, tracks);
+                    protected void onPostExecute(final ArrayList<Track> TRACKS) {
+                        super.onPostExecute(TRACKS);
 
-                        startActivity(intent);
-                        activity.finish();
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                ListView listView = (ListView) findViewById(R.id.trackListView);
+                                listView.setAdapter(new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track));
+                                listView.setSelection(track == null ? -1 : track.getId());
+                                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                        Intent intent = new Intent(activity, MusicPlayerActivity.class);
+                                        intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
+                                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+                                        intent.putParcelableArrayListExtra(Constants.TRACKS, TRACKS);
+
+                                        startActivity(intent);
+                                        activity.finish();
+                                    }
+                                });
+                            }
+                        });
                     }
-                });
+                }.execute();
             }
         }
     }

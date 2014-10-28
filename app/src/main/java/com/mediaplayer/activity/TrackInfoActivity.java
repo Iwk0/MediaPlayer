@@ -10,7 +10,8 @@ import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.TimeFormatter;
 
-import java.util.concurrent.TimeUnit;
+import java.io.File;
+import java.text.DecimalFormat;
 
 public class TrackInfoActivity extends Activity {
 
@@ -23,6 +24,7 @@ public class TrackInfoActivity extends Activity {
 
         TextView trackName = (TextView) findViewById(R.id.trackNameView);
         TextView trackDuration = (TextView) findViewById(R.id.trackDurationView);
+        TextView trackSize = (TextView) findViewById(R.id.fileLengthView);
 
         Bundle extras = getIntent().getExtras();
 
@@ -30,6 +32,7 @@ public class TrackInfoActivity extends Activity {
             Track track = extras.getParcelable(Constants.TRACK);
             trackName.setText(trackName.getText() + " " + track.getName());
             trackDuration.setText(trackDuration.getText() + " " + TimeFormatter.format(track.getDuration()));
+            trackSize.setText(trackSize.getText() + " " + new DecimalFormat("#.#").format(new File(track.getPath()).length() / 1048576.0).concat("MB"));
         }
 
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);

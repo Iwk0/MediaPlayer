@@ -7,15 +7,15 @@ import android.os.Environment;
  */
 public interface Constants {
 
-    int DATABASE_VERSION = 41;
-    String TRACKS_PATH = "all tracks";
+    int DATABASE_VERSION = 46;
+    String TRACKS = "all tracks";
     String TRACK = "track";
-    String SAVE_LOOPING = "looping";
-    String SAVE_RANDOM_MODE = "shuffle mode";
+    String LOOPING_MODE = "looping";
+    String SHUFFLE_MODE = "shuffle mode";
     String RECENTLY_PLAYED = "recently played";
     String STORAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
-    String DATABASE_NAME = "recentlyPlayedTracks";
     String DATABASE = "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT, %s INTEGER);";
+    String DATABASE_NAME = "Tracks";
     String RECENTLY_PLAYED_TABLE_NAME = "paths";
     String QUICK_LIST_TABLE_NAME = "quickList";
     String COLUMN_ID = "id";

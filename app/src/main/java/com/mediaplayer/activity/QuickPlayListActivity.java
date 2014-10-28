@@ -39,9 +39,10 @@ public class QuickPlayListActivity extends Activity {
             protected void onPostExecute(final ArrayList<Track> TRACKS) {
                 super.onPostExecute(TRACKS);
 
-                ListView listView = (ListView) findViewById(R.id.trackListView);
                 final PlayListAdapter playListAdapter = new PlayListAdapter(QuickPlayListActivity.this, R.layout.playlist_item, TRACKS);
-                listView.setAdapter(new PlayListAdapter(QuickPlayListActivity.this, R.layout.playlist_item, TRACKS));
+
+                ListView listView = (ListView) findViewById(R.id.trackListView);
+                listView.setAdapter(playListAdapter);
 
                 findViewById(R.id.addButton).setOnClickListener(new View.OnClickListener() {
 

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class TrackListFragment extends Fragment {
 
-    private ArrayList<Track> recentlyPlayedTracks;
+    private ArrayList<Track> recentlyPlayed;
     private Database database;
     private Track track;
 
@@ -63,8 +63,8 @@ public class TrackListFragment extends Fragment {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Intent intent = new Intent(activity, MusicPlayerActivity.class);
                         intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
-                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayedTracks);
-                        intent.putParcelableArrayListExtra(Constants.TRACKS_PATH, TRACKS);
+                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+                        intent.putParcelableArrayListExtra(Constants.TRACKS, TRACKS);
 
                         startActivity(intent);
                         activity.finish();
@@ -76,7 +76,7 @@ public class TrackListFragment extends Fragment {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
-                recentlyPlayedTracks = database.getAllTracks(Constants.RECENTLY_PLAYED_TABLE_NAME);
+                recentlyPlayed = database.getAllTracks(Constants.RECENTLY_PLAYED_TABLE_NAME);
                 return Tracks.getAllTracks(activity);
             }
         }.execute();

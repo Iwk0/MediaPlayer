@@ -37,14 +37,15 @@ import java.util.Random;
 
 public class MusicPlayerActivity extends Activity {
 
-    private MediaPlayer mediaPlayer;
     private List<Track> tracks;
-    private List<Track> recentlyPlayedTracks;
+    private List<Track> recentlyPlayed;
+
+    private MediaPlayer mediaPlayer;
     private Image image;
     private Runnable runnable;
     private Handler handler;
     private SaveSettings saveSettings;
-    private Database recentlyPlayedTracksTracksRepository;
+    private Database database;
 
     //Views
     private SeekBar seekBar;
@@ -61,17 +62,17 @@ public class MusicPlayerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
 
-        recentlyPlayedTracksTracksRepository = new Database(this);
+        database = new Database(this);
         saveSettings = new SaveSettings(this);
 
-        shuffleMode = saveSettings.load(Constants.SAVE_RANDOM_MODE, false);
-        isLooping = saveSettings.load(Constants.SAVE_LOOPING, true);
+        isLooping = saveSettings.load(Constants.LOOPING_MODE, true);
+        shuffleMode = saveSettings.load(Constants.SHUFFLE_MODE, false);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.image);
         currentTimeView = (TextView) findViewById(R.id.currentTime);
-        trackDurationView = (TextView) findViewById(R.id.songDuration);
+        trackDurationView = (TextView) findViewById(R.id.trackDuration);
         trackNameView = (TextView) findViewById(R.id.trackName);
 
         //Allow music volume control
@@ -79,10 +80,14 @@ public class MusicPlayerActivity extends Activity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            tracks = extras.getParcelableArrayList(Constants.TRACKS_PATH);
-            recentlyPlayedTracks = extras.getParcelableArrayList(Constants.RECENTLY_PLAYED);
+            tracks = extras.getParcelableArrayList(Constants.TRACKS);
+            recentlyPlayed = extras.getParcelableArrayList(Constants.RECENTLY_PLAYED);
 
             Track track = extras.getParcelable(Constants.TRACK);
+            if (track == null) {
+                track = tracks.get(0);
+            }
+
             String trackName = track.getName();
             trackNameView.setText(trackName);
             trackNameView.setTag(track);
@@ -116,13 +121,13 @@ public class MusicPlayerActivity extends Activity {
             if (shuffleMode) {
                 ((ImageButton) findViewById(R.id.randomMode)).setImageResource(R.drawable.random_pressed);
 
-                final int SIZE = recentlyPlayedTracks.size();
-                if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(trackName)) {
-                    recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
-                    recentlyPlayedTracks.add(track);
+                final int SIZE = recentlyPlayed.size();
+                if (SIZE > 0 && !recentlyPlayed.get(SIZE - 1).getName().equals(trackName)) {
+                    database.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
+                    recentlyPlayed.add(track);
                 }
 
-                shuffleIndex = recentlyPlayedTracks.size() - 1;
+                shuffleIndex = SIZE;
             }
 
 
@@ -205,8 +210,8 @@ public class MusicPlayerActivity extends Activity {
         super.onBackPressed();
         handler.removeCallbacks(runnable);
 
-        saveSettings.save(Constants.SAVE_LOOPING, isLooping);
-        saveSettings.save(Constants.SAVE_RANDOM_MODE, shuffleMode);
+        saveSettings.save(Constants.LOOPING_MODE, isLooping);
+        saveSettings.save(Constants.SHUFFLE_MODE, shuffleMode);
         saveSettings.save(Constants.TRACK, (Track) trackNameView.getTag());
 
         if (mediaPlayer != null) {
@@ -262,12 +267,12 @@ public class MusicPlayerActivity extends Activity {
                 ((ImageButton) view).setImageResource(R.drawable.random_pressed);
 
                 Track track = tracks.get(trackIndex);
-                final int SIZE = recentlyPlayedTracks.size();
+                final int SIZE = recentlyPlayed.size();
 
-                if (SIZE > 0 && !recentlyPlayedTracks.get(SIZE - 1).getName().equals(track.getName())) {
-                    recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
-                    recentlyPlayedTracks.add(track);
-                    shuffleIndex = recentlyPlayedTracks.size() - 1;
+                if (SIZE > 0 && !recentlyPlayed.get(SIZE - 1).getName().equals(track.getName())) {
+                    database.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
+                    recentlyPlayed.add(track);
+                    shuffleIndex = SIZE;
                 }
             }
 
@@ -280,8 +285,8 @@ public class MusicPlayerActivity extends Activity {
                 mediaPlayer = null;
             }
 
-            saveSettings.save(Constants.SAVE_LOOPING, isLooping);
-            saveSettings.save(Constants.SAVE_RANDOM_MODE, shuffleMode);
+            saveSettings.save(Constants.LOOPING_MODE, isLooping);
+            saveSettings.save(Constants.SHUFFLE_MODE, shuffleMode);
             saveSettings.save(Constants.TRACK, (Track) trackNameView.getTag());
 
             startActivity(new Intent(this, MainActivity.class));
@@ -295,8 +300,8 @@ public class MusicPlayerActivity extends Activity {
             @Override
             public void run() {
                 if (shuffleMode) {
-                    if (shuffleIndex + 1 < recentlyPlayedTracks.size()) {
-                        trackChanger(recentlyPlayedTracks.get(++shuffleIndex));
+                    if (shuffleIndex + 1 < recentlyPlayed.size()) {
+                        trackChanger(recentlyPlayed.get(++shuffleIndex));
                     } else {
                         Random random = new Random();
                         trackIndex = random.nextInt(tracks.size());
@@ -304,22 +309,24 @@ public class MusicPlayerActivity extends Activity {
                         Track track = tracks.get(trackIndex);
 
                         String trackName = track.getName();
-                        final int SIZE = recentlyPlayedTracks.size();
+                        final int SIZE = recentlyPlayed.size();
 
-                        while (SIZE > 0 && recentlyPlayedTracks.get(SIZE - 1).getName().equals(trackName)) {
+                        while (SIZE > 0 && recentlyPlayed.get(SIZE - 1).getName().equals(trackName)) {
                             trackIndex = random.nextInt(tracks.size());
                             track = tracks.get(trackIndex);
+                            trackName = track.getName();
                         }
 
-                        recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
-                        recentlyPlayedTracks.add(track);
+                        database.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
+                        recentlyPlayed.add(track);
 
-                        shuffleIndex = recentlyPlayedTracks.size() - 1;
+                        shuffleIndex = recentlyPlayed.size() - 1;
 
                         trackChanger(track);
                     }
                 } else {
-                    trackChanger(tracks.get(++trackIndex));
+                    trackIndex = trackIndex == tracks.size() - 1 ? 0 : ++trackIndex;
+                    trackChanger(tracks.get(trackIndex));
                 }
             }
         }).start();
@@ -333,13 +340,13 @@ public class MusicPlayerActivity extends Activity {
                 if (shuffleMode) {
                     Random random = new Random();
 
-                    if (recentlyPlayedTracks.size() > 1 && shuffleIndex > 0) {
+                    if (recentlyPlayed.size() > 1 && shuffleIndex > 0) {
                         File recentlyTrack;
                         Track track;
                         String trackPath;
 
                         do {
-                            track = recentlyPlayedTracks.get(--shuffleIndex);
+                            track = recentlyPlayed.get(--shuffleIndex);
                             trackPath = track.getPath();
                             recentlyTrack = new File(trackPath);
                         } while (!recentlyTrack.exists() && shuffleIndex > 0);
@@ -355,23 +362,23 @@ public class MusicPlayerActivity extends Activity {
 
                         Track track = tracks.get(trackIndex);
                         String trackName = track.getName();
-                        final int SIZE = recentlyPlayedTracks.size();
+                        final int SIZE = recentlyPlayed.size();
 
-                        while (SIZE > 0 && recentlyPlayedTracks.get(SIZE - 1).getName().equals(trackName)) {
+                        while (SIZE > 0 && recentlyPlayed.get(SIZE - 1).getName().equals(trackName)) {
                             trackIndex = random.nextInt(tracks.size());
                             track = tracks.get(trackIndex);
+                            trackName = track.getName();
                         }
 
-                        recentlyPlayedTracksTracksRepository.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
-                        recentlyPlayedTracks.add(0, track);
+                        database.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
+                        recentlyPlayed.add(0, track);
                         shuffleIndex = 0;
 
                         trackChanger(track);
                     }
                 } else {
-                    if (trackIndex - 1 >= 0) {
-                        trackChanger(tracks.get(--trackIndex));
-                    }
+                    trackIndex = trackIndex - 1 < 0 ? tracks.size() - 1 : --trackIndex;
+                    trackChanger(tracks.get(trackIndex));
                 }
             }
         }).start();

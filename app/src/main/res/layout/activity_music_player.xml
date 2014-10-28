@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,12 +8,12 @@
     tools:context="com.mediaplayer.activity.MusicPlayerActivity">
 
     <TextView
+        android:id="@+id/trackName"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:textSize="20sp"
-        android:gravity="center"
         android:textStyle="bold"
-        android:id="@+id/trackName"
+        android:gravity="center"
         android:onClick="clickEvents"
         android:clickable="true" />
 
@@ -32,108 +34,108 @@
             android:indeterminateDrawable="@drawable/progress" />
 
         <ImageView
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/image"
             android:layout_alignParentTop="true" />
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/timeLine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/seekBar"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:id="@+id/timeLine"
-        android:layout_above="@+id/seekBar">
+        android:paddingRight="10dp">
 
         <TextView
+            android:id="@+id/currentTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/repeat"
             android:text="@string/current_time"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/currentTime"
-            android:layout_toRightOf="@+id/repeat" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
+            android:id="@+id/trackDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/randomMode"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/songDuration" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <ImageButton
+            android:id="@+id/repeat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:id="@+id/repeat"
             android:src="@drawable/repeat"
             android:onClick="clickEvents" />
 
         <ImageButton
+            android:id="@+id/randomMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:background="@null"
-            android:id="@+id/randomMode"
             android:src="@drawable/random"
-            android:onClick="clickEvents"
-            android:layout_alignParentRight="true" />
+            android:onClick="clickEvents" />
 
     </RelativeLayout >
 
     <SeekBar
+        android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:id="@+id/seekBar"
         android:layout_above="@+id/menu" />
 
     <RelativeLayout
+        android:id="@+id/menu"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@drawable/controls_background"
         android:layout_alignParentBottom="true"
-        android:id="@+id/menu">
+        android:background="@drawable/controls_background">
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/clicked_rewind"
             android:id="@+id/previous"
-            android:onClick="changeTrackEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/controlButton"
-            android:layout_toLeftOf="@+id/controlButton" />
+            android:layout_toLeftOf="@+id/controlButton"
+            android:background="@drawable/clicked_rewind"
+            android:onClick="changeTrackEvents" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/clicked_pause"
             android:id="@+id/controlButton"
-            android:onClick="clickEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true" />
+            android:background="@drawable/clicked_pause"
+            android:onClick="clickEvents" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/clicked_forward"
             android:id="@+id/next"
-            android:onClick="changeTrackEvents"
-            android:layout_alignTop="@+id/controlButton"
-            android:layout_toRightOf="@+id/controlButton" />
-
-        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/playlist"
+            android:layout_alignTop="@+id/controlButton"
+            android:layout_toRightOf="@+id/controlButton"
+            android:background="@drawable/clicked_forward"
+            android:onClick="changeTrackEvents" />
+
+        <ImageButton
             android:id="@+id/playlist"
-            android:onClick="clickEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/controlButton"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            android:background="@drawable/playlist"
+            android:onClick="clickEvents" />
 
     </RelativeLayout>
 

@@ -18,20 +18,20 @@
         android:indeterminateDrawable="@drawable/progress" />
 
     <ListView
+        android:id="@+id/trackListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/trackListView"
+        android:layout_above="@+id/addButton"
         android:clickable="false"
-        android:scrollingCache="false"
-        android:layout_above="@+id/addButton" />
+        android:scrollingCache="false" />
 
     <Button
         android:id="@+id/addButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_track"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:text="@string/add_track" />
 
 </RelativeLayout>

@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,19 +8,28 @@
     tools:context="com.mediaplayer.activity.TrackInfoActivity">
 
     <TextView
-        android:textSize="20sp"
         android:id="@+id/trackNameView"
-        android:text="@string/track"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:textSize="20sp"
-        android:id="@+id/trackDurationView"
-        android:text="@string/duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/track"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/trackDurationView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trackNameView"
         android:layout_marginTop="40dp"
-        android:layout_below="@+id/trackNameView" />
+        android:text="@string/duration"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/fileLengthView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/trackDurationView"
+        android:layout_marginTop="40dp"
+        android:text="@string/file_length"
+        android:textSize="20sp" />
 
 </RelativeLayout>
