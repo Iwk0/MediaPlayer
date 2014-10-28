@@ -43,7 +43,9 @@ public class XmlParser {
                     break;
                 case XmlPullParser.END_TAG:
                     if (tagName.equalsIgnoreCase(Constants.ID)) {
-                        image.setId(Integer.valueOf(curText));
+                        if (image != null) {
+                            image.setId(Integer.valueOf(curText));
+                        }
                     } else if (tagName.equalsIgnoreCase(Constants.PATH)) {
                         paths.add(curText);
                     }
