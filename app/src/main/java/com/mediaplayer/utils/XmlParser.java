@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by imishev on 15.10.2014 г..
- */
 public class XmlParser {
 
     public static Image xmlParserImage(int imagesId) throws XmlPullParserException, IOException {

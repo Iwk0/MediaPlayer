@@ -10,18 +10,12 @@ import android.widget.LinearLayout;
 
 import com.mediaplayer.R;
 
-/**
- * Created by imishev on 21.10.2014 г..
- */
 public class PlayListFragment extends Fragment {
 
-    private View view;
-    private LinearLayout linearLayout;
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        view = inflater.inflate(R.layout.activity_play_list, container, false);
+        View view = inflater.inflate(R.layout.activity_play_list, container, false);
 
-        linearLayout = (LinearLayout) view.findViewById(R.id.quickPlayList);
+        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.quickPlayList);
         linearLayout.setOnClickListener(new View.OnClickListener() {
 
             @Override

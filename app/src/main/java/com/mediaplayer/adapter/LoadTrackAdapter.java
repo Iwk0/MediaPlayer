@@ -13,9 +13,6 @@ import com.mediaplayer.model.Track;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by imishev on 10.10.2014 г..
- */
 public class LoadTrackAdapter extends ArrayAdapter<Track> {
 
     private static class ViewHolder {

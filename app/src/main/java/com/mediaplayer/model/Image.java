@@ -2,9 +2,6 @@ package com.mediaplayer.model;
 
 import java.util.List;
 
-/**
- * Created by imishev on 25.9.2014 г..
- */
 public class Image {
 
     private int id;

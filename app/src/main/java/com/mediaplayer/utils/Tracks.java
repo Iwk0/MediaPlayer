@@ -8,9 +8,6 @@ import com.mediaplayer.model.Track;
 
 import java.util.ArrayList;
 
-/**
- * Created by Ivo Mishev on 26/10/2014.
- */
 public class Tracks {
 
     public static ArrayList<Track> getAllTracks(Activity activity) {

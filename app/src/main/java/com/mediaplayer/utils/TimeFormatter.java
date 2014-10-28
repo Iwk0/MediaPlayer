@@ -2,9 +2,6 @@ package com.mediaplayer.utils;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by imishev on 24.10.2014 г..
- */
 public class TimeFormatter {
 
     public static String format(int duration) {

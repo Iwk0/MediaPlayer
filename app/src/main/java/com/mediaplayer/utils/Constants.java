@@ -2,9 +2,6 @@ package com.mediaplayer.utils;
 
 import android.os.Environment;
 
-/**
- * Created by imishev on 22.10.2014 г..
- */
 public interface Constants {
 
     int DATABASE_VERSION = 46;

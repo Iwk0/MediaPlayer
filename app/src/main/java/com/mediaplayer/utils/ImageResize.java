@@ -3,9 +3,6 @@ package com.mediaplayer.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-/**
- * Created by imishev on 31.7.2014 г..
- */
 public class ImageResize {
 
     public static Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {

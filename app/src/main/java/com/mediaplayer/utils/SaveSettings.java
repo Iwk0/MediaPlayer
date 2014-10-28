@@ -7,9 +7,6 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.mediaplayer.model.Track;
 
-/**
- * Created by imishev on 16.10.2014 г..
- */
 public class SaveSettings {
 
     private SharedPreferences sp;

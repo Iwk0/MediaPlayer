@@ -7,9 +7,6 @@ import android.app.FragmentTransaction;
 
 import com.mediaplayer.R;
 
-/**
- * Created by imishev on 21.10.2014 г..
- */
 public class TabListener implements ActionBar.TabListener {
 
     private Fragment fragment;

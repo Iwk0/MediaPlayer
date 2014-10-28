@@ -10,9 +10,6 @@ import com.mediaplayer.model.Track;
 
 import java.util.ArrayList;
 
-/**
- * Created by imishev on 26.9.2014 г..
- */
 public class Database extends SQLiteOpenHelper {
 
     public Database(Context context) {
