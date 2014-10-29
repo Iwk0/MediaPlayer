@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
+
     <string name="app_name">MediaPlayer</string>
     <string name="current_time">00:00</string>
     <string name="track">Track:</string>
@@ -9,4 +9,8 @@
     <string name="add_track">Add track</string>
     <string name="play">Play</string>
     <string name="file_length">Size:</string>
+    <string name="title_activity_image_gallery">ImageGallery</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
 </resources>

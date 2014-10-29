@@ -12,7 +12,7 @@ import com.mediaplayer.R;
 import com.mediaplayer.adapter.PlayListAdapter;
 import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.Constants;
-import com.mediaplayer.utils.Tracks;
+import com.mediaplayer.utils.ExternalStorageContent;
 
 import java.util.ArrayList;
 
@@ -60,7 +60,7 @@ public class QuickPlayListActivity extends Activity {
 
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
-                return Tracks.getAllTracks(QuickPlayListActivity.this);
+                return ExternalStorageContent.getAllTracks(QuickPlayListActivity.this);
             }
         }.execute();
     }

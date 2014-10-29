@@ -16,7 +16,7 @@ import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
 import com.mediaplayer.utils.Database;
-import com.mediaplayer.utils.Tracks;
+import com.mediaplayer.utils.ExternalStorageContent;
 import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.SaveSettings;
 
@@ -77,7 +77,7 @@ public class TrackListFragment extends Fragment {
             @Override
             protected ArrayList<Track> doInBackground(Void... voids) {
                 recentlyPlayed = database.getAllTracks(Constants.RECENTLY_PLAYED_TABLE_NAME);
-                return Tracks.getAllTracks(activity);
+                return ExternalStorageContent.getAllTracks(activity);
             }
         }.execute();
 

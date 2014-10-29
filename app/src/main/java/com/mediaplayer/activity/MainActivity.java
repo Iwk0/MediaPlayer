@@ -3,6 +3,7 @@ package com.mediaplayer.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 
@@ -34,5 +35,7 @@ public class MainActivity extends Activity {
 
         actionBar.addTab(musicTab);
         actionBar.addTab(playListTab);
+
+        startActivity(new Intent(this, ImageGallery.class));
     }
 }
