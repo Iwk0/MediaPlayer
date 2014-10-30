@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
-import com.mediaplayer.model.Image1;
 import com.mediaplayer.model.Track;
 
 import java.util.ArrayList;
@@ -43,33 +42,5 @@ public class ExternalStorageContent {
 
         files.close();
         return tracks;
-    }
-
-    public static ArrayList<Image1> getAllImages(Activity activity) {
-        ArrayList<Image1> images = new ArrayList<Image1>();
-
-        final String[] TYPE = {
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-                MediaStore.Images.Media.DATA,
-                MediaStore.Images.Media.HEIGHT,
-                MediaStore.Images.Media.WIDTH
-        };
-
-        Cursor files = activity.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, TYPE, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-
-        int id = 0;
-        while (files.moveToNext()) {
-            Image1 image1 = new Image1();
-            image1.setId(id++);
-            image1.setName(files.getString(1));
-            image1.setPath(files.getString(2));
-            image1.setHeight(files.getDouble(3));
-            image1.setWidth(files.getDouble(4));
-            images.add(image1);
-        }
-
-        files.close();
-        return images;
     }
 }

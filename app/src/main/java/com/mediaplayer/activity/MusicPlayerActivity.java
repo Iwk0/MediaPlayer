@@ -130,7 +130,6 @@ public class MusicPlayerActivity extends Activity {
                 shuffleIndex = SIZE;
             }
 
-
             handler = new Handler();
             runnable = new Runnable() {
 

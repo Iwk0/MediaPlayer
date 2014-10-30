@@ -35,7 +35,5 @@ public class MainActivity extends Activity {
 
         actionBar.addTab(musicTab);
         actionBar.addTab(playListTab);
-
-        startActivity(new Intent(this, ImageGallery.class));
     }
 }

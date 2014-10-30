@@ -34,10 +34,6 @@
             android:name=".activity.QuickPlayListActivity"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
-        <activity
-            android:name=".activity.ImageGallery"
-            android:label="@string/title_activity_image_gallery" >
-        </activity>
     </application>
 
 </manifest>
