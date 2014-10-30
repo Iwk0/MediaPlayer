@@ -91,7 +91,7 @@ public class MusicPlayerActivity extends Activity {
             String trackName = track.getName();
             trackNameView.setText(trackName);
             trackNameView.setTag(track);
-            trackIndex = track.getId();
+            trackIndex = tracks.indexOf(track);
 
             try {
                 mediaPlayer = new MediaPlayer();

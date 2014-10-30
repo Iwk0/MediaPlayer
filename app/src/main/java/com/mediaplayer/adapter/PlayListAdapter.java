@@ -67,7 +67,6 @@ public class PlayListAdapter extends ArrayAdapter<Track>  {
                     track.setSelected(compoundButton.isChecked());
 
                     if (isChecked) {
-                        track.setId(checkedTracks.size());
                         checkedTracks.add(track);
                     } else {
                         checkedTracks.remove(track);

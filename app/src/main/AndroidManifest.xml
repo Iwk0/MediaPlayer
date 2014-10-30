@@ -27,7 +27,7 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name=".activity.PlayListDialog"
+            android:name=".activity.PlayListDialogActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity

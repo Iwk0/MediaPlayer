@@ -21,7 +21,6 @@ public class Database extends SQLiteOpenHelper {
         String createTableRecentlyPlayed = String.format(Constants.DATABASE,
                 Constants.RECENTLY_PLAYED_TABLE_NAME,
                 Constants.COLUMN_ID,
-                Constants.COLUMN_POSITION,
                 Constants.COLUMN_NAME,
                 Constants.COLUMN_PATH,
                 Constants.COLUMN_ALBUM,
@@ -30,7 +29,6 @@ public class Database extends SQLiteOpenHelper {
         String createTableQuickPlayList = String.format(Constants.DATABASE,
                 Constants.QUICK_LIST_TABLE_NAME,
                 Constants.COLUMN_ID,
-                Constants.COLUMN_POSITION,
                 Constants.COLUMN_NAME,
                 Constants.COLUMN_PATH,
                 Constants.COLUMN_ALBUM,
@@ -53,12 +51,16 @@ public class Database extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_NAME, track.getName());
         values.put(Constants.COLUMN_PATH, track.getPath());
-        values.put(Constants.COLUMN_POSITION, track.getId());
         values.put(Constants.COLUMN_ALBUM, track.getAlbum());
         values.put(Constants.COLUMN_DURATION, track.getDuration());
 
         db.insert(table, null, values);
         db.close();
+    }
+
+    public boolean delete(String table, int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(table, Constants.ID + "=" + id, null) > 0;
     }
 
     public ArrayList<Track> getAllTracks(String table) {
@@ -72,11 +74,11 @@ public class Database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Track track = new Track();
-                track.setId(cursor.getInt(1));
-                track.setName(cursor.getString(2));
-                track.setPath(cursor.getString(3));
-                track.setAlbum(cursor.getString(4));
-                track.setDuration(cursor.getInt(5));
+                track.setId(cursor.getInt(0));
+                track.setName(cursor.getString(1));
+                track.setPath(cursor.getString(2));
+                track.setAlbum(cursor.getString(3));
+                track.setDuration(cursor.getInt(4));
                 trackArrayList.add(track);
             } while (cursor.moveToNext());
         }

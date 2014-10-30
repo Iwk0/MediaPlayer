@@ -23,7 +23,6 @@ public class ExternalStorageContent {
 
         Cursor files = activity.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, TYPE, null, null, MediaStore.Audio.Media.DISPLAY_NAME +  " ASC");
 
-        int id = 0;
         while (files.moveToNext()) {
             int duration = files.getInt(4);
 
@@ -31,7 +30,6 @@ public class ExternalStorageContent {
                 String trackName = files.getString(2);
 
                 Track track = new Track();
-                track.setId(id++);
                 track.setName(trackName.substring(0, trackName.length() - 4));
                 track.setPath(files.getString(1));
                 track.setAlbum(files.getString(3));

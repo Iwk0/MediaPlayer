@@ -15,9 +15,9 @@ import android.widget.ProgressBar;
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
 import com.mediaplayer.model.Track;
+import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.Database;
 import com.mediaplayer.utils.ExternalStorageContent;
-import com.mediaplayer.utils.Constants;
 import com.mediaplayer.utils.SaveSettings;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class TrackListFragment extends Fragment {
 
                 ListView listView = (ListView) view.findViewById(R.id.trackListView);
                 listView.setAdapter(new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track));
-                listView.setSelection(track == null ? -1 : track.getId());
+                listView.setSelection(track == null ? -1 : TRACKS.indexOf(track));
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     @Override
