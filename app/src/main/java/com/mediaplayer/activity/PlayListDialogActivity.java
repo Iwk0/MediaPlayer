@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.mediaplayer.R;
 import com.mediaplayer.adapter.LoadTrackAdapter;
@@ -45,6 +44,7 @@ public class PlayListDialogActivity extends Activity {
         track = saveSettings.load(Constants.TRACK);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        listView = (ListView) findViewById(R.id.trackListView);
 
         new AsyncTask<Void, Void, ArrayList<Track>>() {
 
@@ -59,46 +59,10 @@ public class PlayListDialogActivity extends Activity {
                 super.onPostExecute(TRACKS);
 
                 loadTrackAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
-                listView = (ListView) findViewById(R.id.trackListView);
                 listView.setAdapter(loadTrackAdapter);
                 listView.setSelection(track == null ? -1 : TRACKS.indexOf(track));
-                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-                    @Override
-                    public boolean onItemLongClick(final AdapterView<?> adapterView, final View view, final int i, long l) {
-                        new AlertDialog.Builder(activity)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setTitle(R.string.delete)
-                                .setMessage(R.string.confirm_message)
-                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        database.delete(Constants.QUICK_LIST_TABLE_NAME, ((Track) adapterView.getItemAtPosition(i)).getId());
-
-                                        TRACKS.remove(i);
-                                        loadTrackAdapter.notifyDataSetChanged();
-                                    }
-                                })
-                                .setNegativeButton(R.string.no, null)
-                                .show();
-
-                        return true;
-                    }
-                });
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Intent intent = new Intent(activity, MusicPlayerActivity.class);
-                        intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
-                        intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
-                        intent.putParcelableArrayListExtra(Constants.TRACKS, TRACKS);
-
-                        startActivity(intent);
-                        activity.finish();
-                    }
-                });
+                listView.setOnItemLongClickListener(new LongClick(TRACKS, database));
+                listView.setOnItemClickListener(new OnClick(TRACKS));
 
                 progressBar.setVisibility(View.GONE);
             }
@@ -109,87 +73,82 @@ public class PlayListDialogActivity extends Activity {
                 return database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
             }
         }.execute();
-
-        findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                startActivityForResult(new Intent(activity, QuickPlayListActivity.class), 1);
-            }
-        });
-
-        findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(PlayListDialogActivity.this, MusicPlayerActivity.class);
-                intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
-                intent.putParcelableArrayListExtra(Constants.TRACKS, database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME));
-
-                startActivity(intent);
-                activity.finish();
-            }
-        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                new AsyncTask<Void, Void, ArrayList<Track>>() {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            new AsyncTask<Void, Void, ArrayList<Track>>() {
 
-                    @Override
-                    protected ArrayList<Track> doInBackground(Void... voids) {
-                        ArrayList<Track> tracks = data.getParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA);
+                @Override
+                protected ArrayList<Track> doInBackground(Void... voids) {
+                    ArrayList<Track> tracks = data.getParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA);
+                    database.add(tracks, Constants.QUICK_LIST_TABLE_NAME);
+                    return database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
+                }
 
-                        for (Track track : tracks) {
-                            database.add(track, Constants.QUICK_LIST_TABLE_NAME);
-                        }
+                @Override
+                protected void onPostExecute(final ArrayList<Track> TRACKS) {
+                    super.onPostExecute(TRACKS);
+                    loadTrackAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
+                    listView.setAdapter(loadTrackAdapter);
+                    listView.setOnItemLongClickListener(new LongClick(TRACKS, database));
+                    listView.setOnItemClickListener(new OnClick(TRACKS));
+                }
+            }.execute();
+        }
+    }
 
-                        return database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME);
-                    }
+    public void events(View view) {
+        int viewId = view.getId();
 
-                    @Override
-                    protected void onPostExecute(final ArrayList<Track> TRACKS) {
-                        super.onPostExecute(TRACKS);
-                        loadTrackAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
-                        listView.setAdapter(loadTrackAdapter);
-                        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        if (viewId == R.id.add) {
+            startActivityForResult(new Intent(activity, QuickPlayListActivity.class), 1);
+        } else if (viewId == R.id.play) {
+            Intent intent = new Intent(PlayListDialogActivity.this, MusicPlayerActivity.class);
+            intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+            intent.putParcelableArrayListExtra(Constants.TRACKS,
+                    database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME));
 
-                            @Override
-                            public boolean onItemLongClick(final AdapterView<?> adapterView, final View view, final int i, long l) {
-                                new AlertDialog.Builder(activity)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle(R.string.delete)
-                                        .setMessage(R.string.confirm_message)
-                                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            startActivity(intent);
+            activity.finish();
+        }
+    }
 
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                database.delete(Constants.QUICK_LIST_TABLE_NAME, ((Track) adapterView.getItemAtPosition(i)).getId());
+    private class OnClick implements AdapterView.OnItemClickListener {
 
-                                                TRACKS.remove(i);
-                                                loadTrackAdapter.notifyDataSetChanged();
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.no, null)
-                                        .show();
+        private ArrayList<Track> tracks;
 
-                                return true;
-                            }
-                        });
-                    }
-                }.execute();
-            }
+        private OnClick(ArrayList<Track> tracks) {
+            this.tracks = tracks;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Intent intent = new Intent(activity, MusicPlayerActivity.class);
+            intent.putExtra(Constants.TRACK, (Track) adapterView.getItemAtPosition(i));
+            intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
+            intent.putParcelableArrayListExtra(Constants.TRACKS, tracks);
+
+            startActivity(intent);
+            activity.finish();
         }
     }
 
     private class LongClick implements AdapterView.OnItemLongClickListener {
 
+        private ArrayList<Track> tracks;
+        private Database database;
+
+        private LongClick(ArrayList<Track> tracks, Database database) {
+            this.tracks = tracks;
+            this.database = database;
+        }
+
         @Override
-        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int i, long l) {
             new AlertDialog.Builder(activity)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(R.string.delete)
@@ -198,9 +157,10 @@ public class PlayListDialogActivity extends Activity {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //database.delete(Constants.QUICK_LIST_TABLE_NAME, ((Track) adapterView.getItemAtPosition(i)).getId());
+                            database.delete(Constants.QUICK_LIST_TABLE_NAME,
+                                    ((Track) adapterView.getItemAtPosition(i)).getId());
 
-                            //TRACKS.remove(i);
+                            tracks.remove(i);
                             loadTrackAdapter.notifyDataSetChanged();
                         }
                     })

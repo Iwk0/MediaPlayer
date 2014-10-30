@@ -39,7 +39,8 @@ public class QuickPlayListActivity extends Activity {
             protected void onPostExecute(final ArrayList<Track> TRACKS) {
                 super.onPostExecute(TRACKS);
 
-                final PlayListAdapter playListAdapter = new PlayListAdapter(QuickPlayListActivity.this, R.layout.playlist_item, TRACKS);
+                final PlayListAdapter playListAdapter = new PlayListAdapter(QuickPlayListActivity.this,
+                        R.layout.playlist_item, TRACKS);
 
                 ((ListView) findViewById(R.id.trackListView)).setAdapter(playListAdapter);
 
@@ -48,7 +49,8 @@ public class QuickPlayListActivity extends Activity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent();
-                        intent.putParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA, playListAdapter.getCheckedTracks());
+                        intent.putParcelableArrayListExtra(Constants.QUICK_PLAY_LIST_DATA,
+                                playListAdapter.getCheckedTracks());
                         setResult(RESULT_OK, intent);
                         finish();
                     }

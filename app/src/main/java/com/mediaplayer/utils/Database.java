@@ -46,30 +46,42 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void add(Track track, String table) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
+
         values.put(Constants.COLUMN_NAME, track.getName());
         values.put(Constants.COLUMN_PATH, track.getPath());
         values.put(Constants.COLUMN_ALBUM, track.getAlbum());
         values.put(Constants.COLUMN_DURATION, track.getDuration());
 
+        SQLiteDatabase db = getWritableDatabase();
         db.insert(table, null, values);
         db.close();
     }
 
+    public void add(ArrayList<Track> tracks, String table) {
+        for (Track track : tracks) {
+            SQLiteDatabase db = getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(Constants.COLUMN_NAME, track.getName());
+            values.put(Constants.COLUMN_PATH, track.getPath());
+            values.put(Constants.COLUMN_ALBUM, track.getAlbum());
+            values.put(Constants.COLUMN_DURATION, track.getDuration());
+
+            db.insert(table, null, values);
+            db.close();
+        }
+    }
+
     public boolean delete(String table, int id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(table, Constants.ID + "=" + id, null) > 0;
+        return getWritableDatabase().delete(table, Constants.ID + "=" + id, null) > 0;
     }
 
     public ArrayList<Track> getAllTracks(String table) {
         ArrayList<Track> trackArrayList = new ArrayList<Track>();
 
-        String selectQuery = String.format("SELECT * FROM %s", table);
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        Cursor cursor = getWritableDatabase().
+                rawQuery(String.format("SELECT * FROM %s", table), null);
 
         if (cursor.moveToFirst()) {
             do {

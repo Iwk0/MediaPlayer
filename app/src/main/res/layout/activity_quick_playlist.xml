@@ -34,14 +34,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/play" />
+            android:text="@string/play"
+            android:onClick="events" />
 
         <Button
             android:id="@+id/add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/add_track" />
+            android:text="@string/add_track"
+            android:onClick="events"/>
 
     </LinearLayout>
 

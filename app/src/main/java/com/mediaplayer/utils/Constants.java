@@ -4,7 +4,7 @@ import android.os.Environment;
 
 public interface Constants {
 
-    int DATABASE_VERSION = 50;
+    int DATABASE_VERSION = 51;
     String TRACKS = "all tracks";
     String TRACK = "track";
     String LOOPING_MODE = "looping";
