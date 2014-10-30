@@ -107,7 +107,7 @@ public class PlayListDialogActivity extends Activity {
         if (viewId == R.id.add) {
             startActivityForResult(new Intent(activity, QuickPlayListActivity.class), 1);
         } else if (viewId == R.id.play) {
-            Intent intent = new Intent(PlayListDialogActivity.this, MusicPlayerActivity.class);
+            Intent intent = new Intent(this, MusicPlayerActivity.class);
             intent.putParcelableArrayListExtra(Constants.RECENTLY_PLAYED, recentlyPlayed);
             intent.putParcelableArrayListExtra(Constants.TRACKS,
                     database.getAllTracks(Constants.QUICK_LIST_TABLE_NAME));

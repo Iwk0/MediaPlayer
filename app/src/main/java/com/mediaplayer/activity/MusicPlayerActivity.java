@@ -161,7 +161,8 @@ public class MusicPlayerActivity extends Activity {
 
                             @Override
                             protected Bitmap doInBackground(Void... voids) {
-                                return ImageResize.decodeSampledBitmapFromUri(Constants.STORAGE_PATH + image.getPaths().get(newIndex), 250, 250);
+                                return ImageResize.decodeSampledBitmapFromUri(Constants.STORAGE_PATH +
+                                        image.getPaths().get(newIndex), 250, 250);
                             }
                         }.execute();
                     }
