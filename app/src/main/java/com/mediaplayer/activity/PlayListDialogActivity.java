@@ -61,7 +61,7 @@ public class PlayListDialogActivity extends Activity {
                 loadTrackAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
                 listView.setAdapter(loadTrackAdapter);
                 listView.setSelection(track == null ? -1 : TRACKS.indexOf(track));
-                listView.setOnItemLongClickListener(new LongClick(TRACKS, database));
+                listView.setOnItemLongClickListener(new LongClick(TRACKS));
                 listView.setOnItemClickListener(new OnClick(TRACKS));
 
                 progressBar.setVisibility(View.GONE);
@@ -94,7 +94,7 @@ public class PlayListDialogActivity extends Activity {
                     super.onPostExecute(TRACKS);
                     loadTrackAdapter = new LoadTrackAdapter(activity, R.layout.track_list_item, TRACKS, track);
                     listView.setAdapter(loadTrackAdapter);
-                    listView.setOnItemLongClickListener(new LongClick(TRACKS, database));
+                    listView.setOnItemLongClickListener(new LongClick(TRACKS));
                     listView.setOnItemClickListener(new OnClick(TRACKS));
                 }
             }.execute();
@@ -140,11 +140,9 @@ public class PlayListDialogActivity extends Activity {
     private class LongClick implements AdapterView.OnItemLongClickListener {
 
         private ArrayList<Track> tracks;
-        private Database database;
 
-        private LongClick(ArrayList<Track> tracks, Database database) {
+        private LongClick(ArrayList<Track> tracks) {
             this.tracks = tracks;
-            this.database = database;
         }
 
         @Override
