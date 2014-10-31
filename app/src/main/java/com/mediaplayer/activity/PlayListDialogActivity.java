@@ -32,7 +32,6 @@ public class PlayListDialogActivity extends Activity {
     private ProgressBar progressBar;
     private ListView listView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
