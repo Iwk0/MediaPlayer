@@ -8,6 +8,7 @@
     <string name="quick">Quick playlist</string>
     <string name="add_track">Add track</string>
     <string name="play">Play</string>
+    <string name="play_list">Playlist</string>
     <string name="file_length">Size:</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

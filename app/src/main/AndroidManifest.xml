@@ -31,6 +31,7 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
+            android:label="@string/play_list"
             android:name=".activity.QuickPlayListActivity"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
