@@ -113,6 +113,12 @@ public class PlayListDialogActivity extends Activity {
 
             startActivity(intent);
             activity.finish();
+
+/*
+            слага checkbox на всички песни
+            for (int i = 0; i < listView.getChildCount(); i++) {
+                listView.getChildAt(i).findViewById(R.id.checkBox).setVisibility(View.VISIBLE);
+            }*/
         }
     }
 
