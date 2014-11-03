@@ -320,7 +320,7 @@ public class MusicPlayerActivity extends Activity {
                         database.add(track, Constants.RECENTLY_PLAYED_TABLE_NAME);
                         recentlyPlayed.add(track);
 
-                        shuffleIndex = recentlyPlayed.size() - 1;
+                        shuffleIndex = SIZE;
 
                         trackChanger(track);
                     }
